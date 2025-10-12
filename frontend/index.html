@@ -46,6 +46,9 @@
                 <button class="tab-button active" data-tab="balancete">
                     📊 Balancete
                 </button>
+                <button class="tab-button" data-tab="configuracoes">
+                    ⚙️ Configurações
+                </button>
                 <button class="tab-button add-tab-btn" id="addTabBtn" title="Adicionar nova aba">
                     ➕
                 </button>
@@ -111,21 +114,6 @@
                 </div>
             </div>
 
-            <div class="card">
-                <h2>🔄 Log de Atualizações</h2>
-                <div class="update-log-container">
-                    <div class="log-controls">
-                        <button type="button" id="clearLogBtn" class="btn btn-outline btn-small">🗑️ Limpar Log</button>
-                        <button type="button" id="testUpdateBtn" class="btn btn-secondary btn-small">🔍 Testar Atualização</button>
-                    </div>
-                    <div class="log-content" id="updateLogContent">
-                        <div class="log-entry info">
-                            <span class="log-time">[00:00:00]</span>
-                            <span class="log-message">Sistema de atualizações inicializado</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
             <div class="card" id="resultCard" style="display: none;">
                 <h2>✅ Resultado</h2>
@@ -134,6 +122,52 @@
                     </div>
                 </div>
 
+                <!-- Aba Configurações -->
+                <div class="tab-content" id="tab-configuracoes">
+                    <div class="main-content">
+                        <!-- Informações da Aplicação -->
+                        <div class="card">
+                            <h2>Informações da Aplicação</h2>
+                            <div class="info-grid">
+                                <div class="info-item">
+                                    <span class="info-label">Versão Atual:</span>
+                                    <span class="info-value" id="currentVersion">Carregando...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Plataforma:</span>
+                                    <span class="info-value" id="platform">Carregando...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Arquitetura:</span>
+                                    <span class="info-value" id="architecture">Carregando...</span>
+                                </div>
+                                <div class="info-item">
+                                    <span class="info-label">Status do Servidor:</span>
+                                    <span class="info-value" id="serverStatus">Carregando...</span>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <!-- Log de Atualizações -->
+                        <div class="card">
+                            <h2>📋 Log de Atualizações</h2>
+                            <div class="update-log-container">
+                                <div class="log-controls">
+                                    <button type="button" id="clearLogBtn" class="btn btn-outline btn-small">🗑️ Limpar Log</button>
+                                    <button type="button" id="testUpdateBtn" class="btn btn-secondary btn-small">🔍 Testar Atualização</button>
+                                </div>
+                                <div class="log-content" id="updateLogContent">
+                                    <div class="log-entry info">
+                                        <span class="log-time">[00:00:00]</span>
+                                        <span class="log-message">Sistema de atualizações inicializado</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
 
             </div>
         </div>

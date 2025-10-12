@@ -21,8 +21,8 @@ const UPDATE_CONFIG = {
     // URL do servidor de atualizações (GitHub Releases)
     UPDATE_SERVER_URL: 'https://github.com/AlexandreSilvestrin/XY-task/releases/latest',
     CHECK_INTERVAL: 24 * 60 * 60 * 1000, // Verificar a cada 24 horas
-    AUTO_DOWNLOAD: false, // Não baixar automaticamente, apenas notificar
-    AUTO_INSTALL_ON_APP_QUIT: true // Instalar automaticamente ao fechar o app
+    AUTO_DOWNLOAD: false, // Sempre perguntar antes de baixar
+    AUTO_INSTALL_ON_APP_QUIT: false // Sempre perguntar antes de instalar
 };
 
 // Configurar o auto-updater
@@ -773,15 +773,7 @@ app.whenReady().then(async () => {
     // Criar janela principal
     createWindow();
     
-    // Verificar atualizações após um pequeno delay para não interferir na inicialização
-    setTimeout(() => {
-        console.log('🔍 Verificando atualizações na inicialização...');
-        if (app.isPackaged) {
-            autoUpdater.checkForUpdatesAndNotify();
-        } else {
-            console.log('⚠️ Modo desenvolvimento - pulando verificação de atualizações');
-        }
-    }, 5000); // Aguardar 5 segundos após a inicialização
+    // Verificação automática removida - usuário deve verificar manualmente
     
     // Eventos específicos do macOS
     app.on('activate', () => {

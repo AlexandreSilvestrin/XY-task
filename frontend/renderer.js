@@ -50,6 +50,7 @@ function initializeApp() {
     loadTheme();
     updateUI();
     checkServerHealth();
+    initializeConfigTab();
 }
 
 function setupEventListeners() {
@@ -1411,5 +1412,58 @@ function setupUpdateEventInterceptors() {
         addUpdateLogEntry('❌ API do Electron não está disponível', 'error');
     }
 }
+
+// Inicializar aba de configurações
+function initializeConfigTab() {
+    console.log('⚙️ Inicializando aba de configurações...');
+    
+    // Carregar informações da aplicação
+    loadAppInfo();
+    
+    // Configurar event listeners da aba de configurações
+    setupConfigTabListeners();
+    
+    // Carregar configurações salvas
+    loadConfigSettings();
+}
+
+// Carregar informações da aplicação
+async function loadAppInfo() {
+    try {
+        if (window.electronAPI && window.electronAPI.getAppInfo) {
+            const appInfo = await window.electronAPI.getAppInfo();
+            
+            // Atualizar informações na interface
+            const currentVersionEl = document.getElementById('currentVersion');
+            const platformEl = document.getElementById('platform');
+            const architectureEl = document.getElementById('architecture');
+            const serverStatusEl = document.getElementById('serverStatus');
+            
+            if (currentVersionEl) currentVersionEl.textContent = appInfo.version || 'Desconhecida';
+            if (platformEl) platformEl.textContent = appInfo.platform || 'Desconhecida';
+            if (architectureEl) architectureEl.textContent = appInfo.arch || 'Desconhecida';
+            if (serverStatusEl) {
+                serverStatusEl.textContent = appInfo.pythonRunning ? '🟢 Online' : '🔴 Offline';
+                serverStatusEl.style.color = appInfo.pythonRunning ? '#4caf50' : '#f44336';
+            }
+        }
+    } catch (error) {
+        console.error('❌ Erro ao carregar informações da aplicação:', error);
+    }
+}
+
+// Configurar event listeners da aba de configurações
+function setupConfigTabListeners() {
+    // Apenas os controles do log de atualizações permanecem
+    console.log('⚙️ Event listeners da aba de configurações configurados');
+}
+
+// Carregar configurações salvas
+function loadConfigSettings() {
+    // Configurações simplificadas - apenas log de atualizações
+    console.log('⚙️ Configurações carregadas');
+}
+
+// Funções de configuração simplificadas removidas
 
 console.log('📱 Frontend carregado com sucesso!');
