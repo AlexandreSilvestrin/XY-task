@@ -1085,29 +1085,99 @@ body::-webkit-scrollbar {
     color: #ef6c00;
 }
 
-/* Estilos para placeholder de gráfico */
-.grafico-placeholder {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 300px;
+/* Estilos para caixa de log de atualizações */
+.update-log-container {
     background: var(--input-bg);
-    border: 2px dashed var(--border-color);
-    border-radius: 12px;
-    padding: 40px;
-    text-align: center;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-top: 16px;
+}
+
+.log-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 16px;
+    justify-content: flex-end;
+}
+
+.btn-small {
+    padding: 8px 16px;
+    font-size: 12px;
+    min-width: auto;
+}
+
+.log-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    padding: 12px;
+    max-height: 300px;
+    overflow-y: auto;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+}
+
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 8px;
+    padding: 4px 0;
+    border-left: 3px solid transparent;
+    padding-left: 8px;
+}
+
+.log-entry:last-child {
+    margin-bottom: 0;
+}
+
+.log-entry.info {
+    border-left-color: #2196f3;
+    background: rgba(33, 150, 243, 0.05);
+}
+
+.log-entry.success {
+    border-left-color: #4caf50;
+    background: rgba(76, 175, 80, 0.05);
+}
+
+.log-entry.warning {
+    border-left-color: #ff9800;
+    background: rgba(255, 152, 0, 0.05);
+}
+
+.log-entry.error {
+    border-left-color: #f44336;
+    background: rgba(244, 67, 54, 0.05);
+}
+
+.log-time {
     color: var(--text-muted);
+    font-weight: 600;
+    margin-right: 12px;
+    min-width: 80px;
+    flex-shrink: 0;
 }
 
-.placeholder-icon {
-    font-size: 4rem;
-    margin-bottom: 20px;
-    opacity: 0.6;
+.log-message {
+    color: var(--text-primary);
+    flex: 1;
+    word-break: break-word;
 }
 
-.grafico-placeholder p {
-    font-size: 1.1rem;
-    line-height: 1.5;
-    max-width: 400px;
+.log-entry.error .log-message {
+    color: #d32f2f;
+}
+
+.log-entry.warning .log-message {
+    color: #f57c00;
+}
+
+.log-entry.success .log-message {
+    color: #388e3c;
+}
+
+.log-entry.info .log-message {
+    color: #1976d2;
 }

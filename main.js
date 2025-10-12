@@ -1,5 +1,6 @@
 const { app, BrowserWindow, dialog, ipcMain } = require('electron');
 const path = require('path');
+const fs = require('fs');
 const { spawn } = require('child_process');
 const axios = require('axios');
 const { autoUpdater } = require('electron-updater');
@@ -25,9 +26,26 @@ const UPDATE_CONFIG = {
 };
 
 // Configurar o auto-updater
-autoUpdater.checkForUpdatesAndNotify();
 autoUpdater.autoDownload = UPDATE_CONFIG.AUTO_DOWNLOAD;
 autoUpdater.autoInstallOnAppQuit = UPDATE_CONFIG.AUTO_INSTALL_ON_APP_QUIT;
+
+// Força aceitar update não assinado (para uso interno)
+autoUpdater.allowPrerelease = true;
+autoUpdater.forceDevUpdateConfig = true;
+
+// Configurar o servidor de atualizações corretamente
+autoUpdater.setFeedURL({
+    provider: 'github',
+    owner: 'AlexandreSilvestrin',
+    repo: 'XY-task',
+    private: false
+});
+
+// Configurar headers para evitar erro 406
+autoUpdater.requestHeaders = {
+    'User-Agent': 'XY-task-updater',
+    'Accept': 'application/vnd.github.v3+json'
+};
 
 let mainWindow;
 let pythonProcess;
@@ -193,7 +211,6 @@ async function startPythonServer() {
 
     try {
         // Verificar se o arquivo Python existe
-        const fs = require('fs');
         if (!fs.existsSync(CONFIG.PYTHON_SCRIPT)) {
             throw new Error(`Arquivo Python não encontrado: ${CONFIG.PYTHON_SCRIPT}`);
         }
@@ -488,13 +505,163 @@ ipcMain.handle('force-stop-python', async () => {
 ipcMain.handle('check-for-updates', async () => {
     try {
         console.log('🔍 Verificando atualizações manualmente...');
-        const result = await autoUpdater.checkForUpdates();
-        return { success: true, result };
+        if (app.isPackaged) {
+            // Usar verificação manual via API REST do GitHub
+            const result = await checkGitHubReleases();
+            
+            // Se há atualização disponível, iniciar download automático
+            if (result.updateAvailable) {
+                console.log('📥 Iniciando download automático da atualização...');
+                await downloadUpdateFromGitHub(result.releaseInfo);
+            }
+            
+            return { success: true, result };
+        } else {
+            console.log('⚠️ Modo desenvolvimento - simulando verificação de atualizações');
+            return { success: false, error: 'Aplicação não está empacotada' };
+        }
     } catch (error) {
         console.error('❌ Erro ao verificar atualizações:', error);
         return { success: false, error: error.message };
     }
 });
+
+// Função para verificar releases via API REST do GitHub
+async function checkGitHubReleases() {
+    try {
+        console.log('🔍 Verificando releases via API REST do GitHub...');
+        
+        // Primeiro, verificar se o repositório existe
+        const repoResponse = await axios.get('https://api.github.com/repos/AlexandreSilvestrin/XY-task', {
+            headers: {
+                'User-Agent': 'XY-task-updater',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            timeout: 10000
+        });
+        
+        console.log('📋 Repositório encontrado:', repoResponse.data.full_name);
+        
+        // Agora buscar as releases
+        const releasesResponse = await axios.get('https://api.github.com/repos/AlexandreSilvestrin/XY-task/releases', {
+            headers: {
+                'User-Agent': 'XY-task-updater',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            timeout: 10000
+        });
+        
+        console.log('📋 Total de releases encontradas:', releasesResponse.data.length);
+        
+        if (releasesResponse.data.length === 0) {
+            throw new Error('Nenhuma release encontrada no repositório');
+        }
+        
+        const latestRelease = releasesResponse.data[0]; // Primeira release é a mais recente
+        const currentVersion = app.getVersion();
+        
+        console.log('📋 Release mais recente:', latestRelease.tag_name);
+        console.log('📋 Versão atual:', currentVersion);
+        
+        // Comparar versões
+        const isUpdateAvailable = compareVersions(latestRelease.tag_name.replace('v', ''), currentVersion) > 0;
+        
+        return {
+            updateAvailable: isUpdateAvailable,
+            currentVersion: currentVersion,
+            latestVersion: latestRelease.tag_name.replace('v', ''),
+            releaseInfo: latestRelease,
+            totalReleases: releasesResponse.data.length
+        };
+        
+    } catch (error) {
+        console.error('❌ Erro ao verificar releases do GitHub:', error);
+        
+        // Se for erro 404, pode ser que o repositório não exista ou seja privado
+        if (error.response && error.response.status === 404) {
+            throw new Error('Repositório não encontrado ou não acessível. Verifique se o repositório existe e é público.');
+        }
+        
+        throw error;
+    }
+}
+
+// Função para comparar versões
+function compareVersions(version1, version2) {
+    const v1parts = version1.split('.').map(Number);
+    const v2parts = version2.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(v1parts.length, v2parts.length); i++) {
+        const v1part = v1parts[i] || 0;
+        const v2part = v2parts[i] || 0;
+        
+        if (v1part > v2part) return 1;
+        if (v1part < v2part) return -1;
+    }
+    
+    return 0;
+}
+
+// Função para baixar atualização do GitHub
+async function downloadUpdateFromGitHub(releaseInfo) {
+    try {
+        console.log('📥 Baixando atualização do GitHub...');
+        
+        // Encontrar o arquivo de instalação para Windows
+        const installerAsset = releaseInfo.assets.find(asset => 
+            asset.name.includes('.exe') && 
+            (asset.name.includes('Setup') || asset.name.includes('Installer'))
+        );
+        
+        if (!installerAsset) {
+            throw new Error('Arquivo de instalação não encontrado na release');
+        }
+        
+        console.log('📦 Arquivo encontrado:', installerAsset.name);
+        console.log('📦 URL de download:', installerAsset.browser_download_url);
+        
+        // Baixar o arquivo
+        const response = await axios({
+            method: 'GET',
+            url: installerAsset.browser_download_url,
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'XY-task-updater',
+                'Accept': 'application/octet-stream'
+            }
+        });
+        
+        const downloadsPath = app.getPath('downloads');
+        const installerPath = path.join(downloadsPath, installerAsset.name);
+        
+        console.log('💾 Salvando em:', installerPath);
+        
+        // Salvar o arquivo
+        const writer = fs.createWriteStream(installerPath);
+        response.data.pipe(writer);
+        
+        return new Promise((resolve, reject) => {
+            writer.on('finish', () => {
+                console.log('✅ Download concluído:', installerPath);
+                resolve({
+                    success: true,
+                    installerPath: installerPath,
+                    version: releaseInfo.tag_name.replace('v', ''),
+                    releaseInfo: releaseInfo
+                });
+            });
+            
+            writer.on('error', (error) => {
+                console.error('❌ Erro ao salvar arquivo:', error);
+                reject(error);
+            });
+        });
+        
+    } catch (error) {
+        console.error('❌ Erro ao baixar atualização:', error);
+        throw error;
+    }
+}
 
 ipcMain.handle('download-update', async () => {
     try {
@@ -507,16 +674,51 @@ ipcMain.handle('download-update', async () => {
     }
 });
 
-ipcMain.handle('install-update', () => {
+// Handler para instalar atualização baixada
+ipcMain.handle('install-update', async () => {
     try {
-        console.log('🔄 Instalando atualização e reiniciando...');
-        autoUpdater.quitAndInstall();
-        return { success: true };
+        console.log('🚀 Instalando atualização...');
+        
+        // Encontrar o arquivo de instalação mais recente na pasta Downloads
+        const downloadsPath = app.getPath('downloads');
+        const files = fs.readdirSync(downloadsPath);
+        
+        const installerFile = files.find(file => 
+            file.includes('XY-task') && 
+            file.includes('Setup') && 
+            file.endsWith('.exe')
+        );
+        
+        if (!installerFile) {
+            throw new Error('Arquivo de instalação não encontrado na pasta Downloads');
+        }
+        
+        const installerPath = path.join(downloadsPath, installerFile);
+        console.log('📦 Executando instalador:', installerPath);
+        
+        // Executar o instalador
+        const { spawn } = require('child_process');
+        const installer = spawn(installerPath, ['/S'], {
+            detached: true,
+            stdio: 'ignore'
+        });
+        
+        installer.unref();
+        
+        // Fechar a aplicação atual
+        setTimeout(() => {
+            app.quit();
+        }, 2000);
+        
+        return { success: true, installerPath: installerPath };
+        
     } catch (error) {
         console.error('❌ Erro ao instalar atualização:', error);
         return { success: false, error: error.message };
     }
 });
+
+// Eventos do auto-updater
 
 ipcMain.handle('get-update-info', () => {
     return {
@@ -574,7 +776,11 @@ app.whenReady().then(async () => {
     // Verificar atualizações após um pequeno delay para não interferir na inicialização
     setTimeout(() => {
         console.log('🔍 Verificando atualizações na inicialização...');
-        autoUpdater.checkForUpdatesAndNotify();
+        if (app.isPackaged) {
+            autoUpdater.checkForUpdatesAndNotify();
+        } else {
+            console.log('⚠️ Modo desenvolvimento - pulando verificação de atualizações');
+        }
     }, 5000); // Aguardar 5 segundos após a inicialização
     
     // Eventos específicos do macOS

@@ -24,7 +24,8 @@
   "win": {
     "target": "nsis",
     "icon": "assets/icon_pg.ico",
-    "publisherName": "Alexandre Silvestrin"
+    "publisherName": "Alexandre Silvestrin",
+    "verifyUpdateCodeSignature": false
   },
   "mac": {
     "target": "dmg",
@@ -47,7 +48,8 @@
   "publish": {
     "provider": "github",
     "owner": "AlexandreSilvestrin",
-    "repo": "XY-task"
+    "repo": "XY-task",
+    "private": false
   },
   "asar": false,
   "npmRebuild": true
