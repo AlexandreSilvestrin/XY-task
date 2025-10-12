@@ -1,0 +1,1017 @@
+/* Reset e configurações básicas */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* Variáveis CSS para temas */
+:root {
+    /* Tema Claro (padrão) */
+    --bg-primary: linear-gradient(135deg, #738cfc 0%, #1d1b94 100%);
+    --bg-secondary: #ffffff;
+    --bg-card: #ffffff;
+    --text-primary: #333333;
+    --text-secondary: #4a5568;
+    --text-muted: #718096;
+    --border-color: #e2e8f0;
+    --input-bg: #f7fafc;
+    --shadow: 0 8px 32px rgba(0,0,0,0.1);
+    --control-bg: rgba(0, 0, 0, 0.3);
+    --control-hover: rgba(0, 0, 0, 0.5);
+}
+
+[data-theme="dark"] {
+    /* Tema Escuro (VS Code) */
+    --bg-primary: #1e1e1e;
+    --bg-secondary: #252526;
+    --bg-card: #2d2d30;
+    --text-primary: #cccccc;
+    --text-secondary: #d4d4d4;
+    --text-muted: #858585;
+    --border-color: #3c3c3c;
+    --input-bg: #3c3c3c;
+    --shadow: 0 8px 32px rgba(0,0,0,0.3);
+    --control-bg: rgba(255, 255, 255, 0.1);
+    --control-hover: rgba(255, 255, 255, 0.2);
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: var(--bg-primary);
+    min-height: 100vh;
+    color: var(--text-primary);
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Evita scroll na janela sem borda */
+    /* Ocultar barras de scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE e Edge */
+    transition: background 0.3s ease, color 0.3s ease;
+}
+
+/* Ocultar barra de scroll no Webkit (Chrome, Safari, Edge) */
+body::-webkit-scrollbar {
+    display: none;
+}
+
+/* Área de arrastar invisível */
+.drag-area {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    z-index: 999;
+    -webkit-app-region: drag; /* Permite arrastar a janela */
+    background: transparent;
+}
+
+/* Botões de controle flutuantes */
+.window-controls {
+    position: fixed;
+    top: 10px;
+    right: 10px;
+    display: flex;
+    gap: 4px;
+    z-index: 1001; /* Acima da área de arrastar */
+    -webkit-app-region: no-drag; /* Permite clicar nos botões */
+}
+
+.control-button {
+    width: 28px;
+    height: 28px;
+    border: none;
+    background: var(--control-bg);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    border-radius: 4px;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.control-button:hover {
+    background: var(--control-hover);
+    transform: scale(1.05);
+}
+
+.theme-toggle-btn:hover {
+    background: rgba(255, 193, 7, 0.8);
+    color: #000;
+}
+
+.theme-icon {
+    font-size: 14px;
+    transition: transform 0.3s ease;
+}
+
+.theme-toggle-btn:hover .theme-icon {
+    transform: rotate(180deg);
+}
+
+.minimize-btn:hover {
+    background: rgba(255, 193, 7, 0.8);
+    color: #000;
+}
+
+.maximize-btn:hover {
+    background: rgba(40, 167, 69, 0.8);
+    color: white;
+}
+
+.close-btn:hover {
+    background: rgba(220, 53, 69, 0.9);
+    color: white;
+}
+
+.close-btn:active {
+    background: rgba(200, 35, 51, 0.9);
+    transform: scale(0.95);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+    height: 100vh; /* Altura total da tela */
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto; /* Permite scroll apenas no conteúdo */
+    /* Ocultar barras de scroll */
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE e Edge */
+}
+
+/* Ocultar barra de scroll do container no Webkit */
+.container::-webkit-scrollbar {
+    display: none;
+}
+
+/* Ocultar todas as barras de scroll globalmente */
+* {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE e Edge */
+}
+
+*::-webkit-scrollbar {
+    display: none; /* Webkit (Chrome, Safari, Edge) */
+}
+
+/* Header */
+.header {
+    text-align: center;
+    margin-bottom: 30px;
+    color: white;
+}
+
+.header h1 {
+    font-size: 2.5rem;
+    margin-bottom: 10px;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+}
+
+.header p {
+    font-size: 1.1rem;
+    opacity: 0.9;
+}
+
+/* Sistema de Abas */
+.tabs-container {
+    width: 100%;
+    margin-bottom: 20px;
+}
+
+.tabs-header {
+    display: flex;
+    background: var(--bg-card);
+    border-radius: 12px 12px 0 0;
+    border: 1px solid var(--border-color);
+    border-bottom: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+.tabs-header::-webkit-scrollbar {
+    display: none;
+}
+
+.tab-button {
+    padding: 12px 20px;
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border-bottom: 3px solid transparent;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.tab-button:hover {
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.tab-button.active {
+    color: #667eea;
+    border-bottom-color: #667eea;
+    background: var(--bg-card);
+}
+
+.add-tab-btn {
+    margin-left: auto;
+    padding: 12px 16px;
+    font-size: 16px;
+    color: var(--text-muted);
+}
+
+.add-tab-btn:hover {
+    background: var(--input-bg);
+    color: #667eea;
+}
+
+.tabs-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 12px 12px;
+    min-height: 400px;
+}
+
+.tab-content {
+    display: none;
+    padding: 20px;
+    animation: fadeIn 0.3s ease;
+}
+
+.tab-content.active {
+    display: block;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.card h2 {
+    color: var(--text-secondary);
+    margin-bottom: 20px;
+    margin-top: 20px;
+    font-size: 1.4rem;
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+/* Input Groups */
+.input-group {
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.file-input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+
+.file-input-container input {
+    flex: 1;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    transition: border-color 0.3s ease;
+    background: var(--input-bg);
+    color: var(--text-primary);
+}
+
+.file-input-container input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: var(--bg-card);
+}
+
+.button-group {
+    display: flex;
+    gap: 8px;
+}
+
+.help-text {
+    display: block;
+    margin-top: 5px;
+    font-size: 12px;
+    color: var(--text-muted);
+    font-style: italic;
+}
+
+.select-input {
+    width: 100%;
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: border-color 0.3s ease;
+}
+
+.select-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: var(--bg-card);
+}
+
+/* Elementos específicos das abas */
+.date-range {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.date-input {
+    padding: 12px 16px;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+    background: var(--input-bg);
+    color: var(--text-primary);
+    transition: border-color 0.3s ease;
+}
+
+.date-input:focus {
+    outline: none;
+    border-color: #667eea;
+    background: var(--bg-card);
+}
+
+.checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    cursor: pointer;
+    font-weight: 500;
+    color: var(--text-secondary);
+}
+
+.checkbox-label input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+}
+
+.checkmark {
+    width: 18px;
+    height: 18px;
+    border: 2px solid var(--border-color);
+    border-radius: 4px;
+    background: var(--input-bg);
+    position: relative;
+    transition: all 0.3s ease;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark {
+    background: #667eea;
+    border-color: #667eea;
+}
+
+.checkbox-label input[type="checkbox"]:checked + .checkmark::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+/* Buttons */
+.btn {
+    padding: 12px 20px;
+    border: none;
+    border-radius: 8px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+}
+
+.btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #738cfc 0%, #1d1b94 100%);
+    color: white;
+}
+
+.btn-primary:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
+.btn-secondary {
+    background: #4a5568;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background: #2d3748;
+    transform: translateY(-1px);
+}
+
+.btn-outline {
+    background: transparent;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-outline:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #48bb78, #38a169);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover:not(:disabled) {
+    background: linear-gradient(135deg, #38a169, #2f855a);
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    margin-top: 25px;
+}
+
+/* Status */
+.status-container {
+    margin-top: 20px;
+}
+
+.status-message {
+    padding: 15px;
+    border-radius: 8px;
+    font-weight: 500;
+    text-align: center;
+    background: var(--input-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+.status-message.success {
+    background: #f0fff4;
+    border-color: #9ae6b4;
+    color: #22543d;
+}
+
+.status-message.error {
+    background: #fed7d7;
+    border-color: #feb2b2;
+    color: #742a2a;
+}
+
+.status-message.processing {
+    background: #ebf8ff;
+    border-color: #90cdf4;
+    color: #2a4365;
+}
+
+/* Progress Bar */
+.progress-bar {
+    width: 100%;
+    height: 8px;
+    background: #e2e8f0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-top: 15px;
+}
+
+.progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #667eea, #764ba2);
+    width: 0%;
+    transition: width 0.3s ease;
+    animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.7; }
+}
+
+/* Result Card */
+#resultContent {
+    background: var(--input-bg);
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    white-space: pre-wrap;
+    max-height: 300px;
+    overflow-y: auto;
+    color: var(--text-primary);
+    transition: all 0.3s ease;
+}
+
+
+/* Footer */
+.footer {
+    margin-top: auto;
+    text-align: center;
+    padding: 20px 0;
+    color: white;
+    opacity: 0.8;
+}
+
+.footer a {
+    color: #60a5fa;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+.footer a:hover {
+    color: #93c5fd;
+    text-decoration: underline;
+}
+
+.footer a:focus {
+    outline: 2px solid #60a5fa;
+    outline-offset: 2px;
+    border-radius: 2px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .container {
+        padding: 15px;
+    }
+    
+    .header h1 {
+        font-size: 2rem;
+    }
+    
+    .file-input-container {
+        flex-direction: column;
+    }
+    
+    .action-buttons {
+        flex-direction: column;
+    }
+    
+    .btn {
+        justify-content: center;
+    }
+}
+
+/* Animations */
+.card {
+    animation: slideIn 0.5s ease-out;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Loading spinner */
+.loading {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #667eea;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
+/* Estilos para logs de resultado */
+.result-summary {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 16px;
+}
+
+.result-summary h3 {
+    color: var(--text-primary);
+    margin-bottom: 12px;
+    font-size: 16px;
+}
+
+.result-summary p {
+    margin-bottom: 8px;
+    color: var(--text-secondary);
+}
+
+.result-logs {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 16px;
+}
+
+.result-logs h3 {
+    color: var(--text-primary);
+    margin-bottom: 16px;
+    font-size: 16px;
+}
+
+.log-entry {
+    display: flex;
+    align-items: center;
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    border-radius: 6px;
+    border-left: 4px solid;
+    background: var(--input-bg);
+    transition: all 0.2s ease;
+}
+
+.log-entry.success {
+    border-left-color: #48bb78;
+    background: rgba(72, 187, 120, 0.1);
+}
+
+.log-entry.error {
+    border-left-color: #f56565;
+    background: rgba(245, 101, 101, 0.1);
+}
+
+.log-icon {
+    font-size: 16px;
+    margin-right: 12px;
+    min-width: 20px;
+}
+
+.log-file {
+    font-weight: 600;
+    color: var(--text-primary);
+    flex: 1;
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+}
+
+.log-status {
+    font-weight: 700;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.log-entry.success .log-status {
+    background: #48bb78;
+    color: white;
+}
+
+.log-entry.error .log-status {
+    background: #f56565;
+    color: white;
+}
+
+.log-error-detail {
+    width: 100%;
+    margin-top: 8px;
+    padding: 8px;
+    background: rgba(245, 101, 101, 0.1);
+    border-radius: 4px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+    border-left: 3px solid #f56565;
+}
+
+/* Notificação de versão */
+.version-notification {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 1000;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    padding: 8px 12px;
+    box-shadow: var(--shadow);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 160px;
+    max-width: 250px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(10px);
+    background: rgba(255, 255, 255, 0.9);
+    opacity: 0.7;
+}
+
+[data-theme="dark"] .version-notification {
+    background: rgba(45, 45, 48, 0.9);
+}
+
+.version-notification.hidden {
+    opacity: 0;
+    transform: translateX(-100%);
+    pointer-events: none;
+}
+
+/* Estado atualizado - muito discreto */
+.version-notification.updated {
+    opacity: 0.4;
+    background: rgba(255, 255, 255, 0.6);
+    border-color: transparent;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .version-notification.updated {
+    background: rgba(45, 45, 48, 0.6);
+}
+
+.version-notification.update-available {
+    opacity: 1;
+    border-color: #ff9800;
+    background: rgba(255, 152, 0, 0.15);
+    box-shadow: 0 4px 16px rgba(255, 152, 0, 0.2);
+}
+
+.version-notification.update-downloading {
+    opacity: 1;
+    border-color: #2196f3;
+    background: rgba(33, 150, 243, 0.15);
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.2);
+}
+
+.version-notification.update-ready {
+    opacity: 1;
+    border-color: #4caf50;
+    background: rgba(76, 175, 80, 0.15);
+    box-shadow: 0 4px 16px rgba(76, 175, 80, 0.2);
+}
+
+.version-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+}
+
+.version-icon {
+    font-size: 14px;
+    line-height: 1;
+    opacity: 0.8;
+}
+
+.version-text {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--text-muted);
+    line-height: 1.2;
+}
+
+/* Texto mais discreto quando atualizado */
+.version-notification.updated .version-icon {
+    opacity: 0.6;
+}
+
+.version-notification.updated .version-text {
+    color: var(--text-muted);
+    opacity: 0.8;
+}
+
+/* Texto mais visível quando há atualização */
+.version-notification.update-available .version-icon,
+.version-notification.update-downloading .version-icon,
+.version-notification.update-ready .version-icon {
+    opacity: 1;
+}
+
+.version-notification.update-available .version-text,
+.version-notification.update-downloading .version-text,
+.version-notification.update-ready .version-text {
+    color: var(--text-primary);
+    opacity: 1;
+}
+
+.version-action-btn {
+    background: var(--bg-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 28px;
+}
+
+.version-action-btn:hover {
+    background: var(--control-hover);
+    transform: scale(1.05);
+}
+
+.version-action-btn:active {
+    transform: scale(0.95);
+}
+
+
+/* Animações para a notificação */
+@keyframes slideInLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-100%);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        transform: scale(1);
+    }
+    50% {
+        transform: scale(1.05);
+    }
+}
+
+.version-notification.update-available .version-action-btn {
+    animation: pulse 2s infinite;
+}
+
+.version-notification {
+    animation: slideInLeft 0.3s ease-out;
+}
+
+/* Responsividade para a notificação */
+@media (max-width: 768px) {
+    .version-notification {
+        top: 10px;
+        left: 10px;
+        right: 10px;
+        max-width: none;
+        min-width: auto;
+        padding: 6px 10px;
+    }
+    
+    .version-text {
+        font-size: 11px;
+    }
+    
+    .version-icon {
+        font-size: 12px;
+    }
+    
+    .version-action-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+        min-width: 28px;
+        height: 24px;
+    }
+}
+
+/* Estilos para seção de atualizações */
+.update-section {
+    margin-top: 20px;
+}
+
+.update-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    margin-bottom: 20px;
+    padding: 15px;
+    background: var(--input-bg);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+.info-item {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-item .label {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    font-weight: 500;
+}
+
+.info-item .value {
+    font-size: 1rem;
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.update-controls {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.update-progress {
+    margin-bottom: 15px;
+}
+
+.update-progress .progress-bar {
+    width: 100%;
+    height: 8px;
+    background: var(--border-color);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 8px;
+}
+
+.update-progress .progress-fill {
+    height: 100%;
+    background: linear-gradient(90deg, #4CAF50, #45a049);
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.update-progress .progress-text {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.update-message {
+    padding: 12px;
+    border-radius: 6px;
+    font-size: 0.9rem;
+    line-height: 1.4;
+    margin-top: 10px;
+}
+
+.update-message.success {
+    background: rgba(76, 175, 80, 0.1);
+    border: 1px solid rgba(76, 175, 80, 0.3);
+    color: #2e7d32;
+}
+
+.update-message.error {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.3);
+    color: #c62828;
+}
+
+.update-message.info {
+    background: rgba(33, 150, 243, 0.1);
+    border: 1px solid rgba(33, 150, 243, 0.3);
+    color: #1565c0;
+}
+
+.update-message.warning {
+    background: rgba(255, 152, 0, 0.1);
+    border: 1px solid rgba(255, 152, 0, 0.3);
+    color: #ef6c00;
+}

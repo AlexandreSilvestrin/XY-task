@@ -1,0 +1,28 @@
+{
+  "name": "xy-task",
+  "version": "1.0.0",
+  "description": "Aplicação XY-task - Electron + Python para transformação de arquivos",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "dev": "electron . --dev",
+    "build": "electron-builder --config electron-builder.json",
+    "dist": "electron-builder --config electron-builder.json --publish=never"
+  },
+  "keywords": [
+    "electron",
+    "python",
+    "flask",
+    "file-processing"
+  ],
+  "author": "Alexandre Silvestrin",
+  "license": "MIT",
+  "devDependencies": {
+    "electron": "^28.0.0",
+    "electron-builder": "^24.13.3"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "electron-updater": "^6.6.2"
+  }
+}

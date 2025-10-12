@@ -1,0 +1,54 @@
+{
+  "appId": "com.empresa.programa",
+  "productName": "XY-task",
+  "directories": {
+    "output": "dist"
+  },
+  "files": [
+    "main.js",
+    "preload.js",
+    "package.json",
+    "frontend/**/*",
+    "node_modules/axios/**/*",
+    "node_modules/axios/**/*.js",
+    "node_modules/axios/**/*.json",
+    "node_modules/electron-updater/**/*"
+  ],
+  "extraResources": [
+    {
+      "from": "backend/",
+      "to": "backend/",
+      "filter": ["**/*"]
+    }
+  ],
+  "win": {
+    "target": "nsis",
+    "icon": "assets/icon_pg.ico",
+    "publisherName": "Alexandre Silvestrin"
+  },
+  "mac": {
+    "target": "dmg",
+    "icon": "assets/icon_pg.png",
+    "category": "public.app-category.productivity"
+  },
+  "linux": {
+    "target": "AppImage",
+    "icon": "assets/icon_pg.png",
+    "category": "Office"
+  },
+  "nsis": {
+    "oneClick": false,
+    "allowToChangeInstallationDirectory": true,
+    "createDesktopShortcut": true,
+    "createStartMenuShortcut": true,
+    "installerIcon": "assets/icon_pg.ico",
+    "uninstallerIcon": "assets/icon_pg.ico"
+  },
+  "publish": {
+    "provider": "github",
+    "owner": "seu-usuario",
+    "repo": "seu-repositorio"
+  },
+  "asar": false,
+  "npmRebuild": true
+}
