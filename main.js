@@ -17,9 +17,8 @@ const CONFIG = {
 
 // Configurações do Auto-Updater
 const UPDATE_CONFIG = {
-    // URL do servidor de atualizações (você pode usar GitHub Releases, seu próprio servidor, etc.)
-    // Para GitHub Releases, use: https://github.com/usuario/repositorio/releases/latest
-    UPDATE_SERVER_URL: 'https://github.com/seu-usuario/seu-repositorio/releases/latest',
+    // URL do servidor de atualizações (GitHub Releases)
+    UPDATE_SERVER_URL: 'https://github.com/AlexandreSilvestrin/XY-task/releases/latest',
     CHECK_INTERVAL: 24 * 60 * 60 * 1000, // Verificar a cada 24 horas
     AUTO_DOWNLOAD: false, // Não baixar automaticamente, apenas notificar
     AUTO_INSTALL_ON_APP_QUIT: true // Instalar automaticamente ao fechar o app

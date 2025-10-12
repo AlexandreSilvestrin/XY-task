@@ -46,8 +46,8 @@
   },
   "publish": {
     "provider": "github",
-    "owner": "seu-usuario",
-    "repo": "seu-repositorio"
+    "owner": "AlexandreSilvestrin",
+    "repo": "XY-task"
   },
   "asar": false,
   "npmRebuild": true

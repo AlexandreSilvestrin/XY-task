@@ -1,227 +1,162 @@
-# Sistema de Atualizações Automáticas
+# 🔄 Sistema de Atualizações Automáticas - XY-task
 
-Este documento explica como configurar e usar o sistema de atualizações automáticas implementado no programa XY-task.
+## 📋 Configuração Completa
 
-## 📋 Visão Geral
+### ✅ **O que foi configurado:**
 
-O sistema de atualizações foi implementado usando o `electron-updater`, que permite:
-- ✅ Verificação automática de atualizações
-- ✅ Download automático ou manual de atualizações
-- ✅ Instalação automática ao fechar o aplicativo
-- ✅ Interface visual para controle manual
-- ✅ Suporte a GitHub Releases
+1. **electron-updater** - Biblioteca para atualizações automáticas
+2. **GitHub Actions** - Build e release automático
+3. **Interface de usuário** - Controles de atualização na aplicação
+4. **Configuração do electron-builder** - Para publicação no GitHub
 
-## 🔧 Configuração
+---
 
-### 1. Configuração do GitHub Releases
+## 🚀 **Como usar o sistema de atualizações:**
 
-Para usar o sistema de atualizações, você precisa:
+### **1. Para Desenvolvedores:**
 
-1. **Criar um repositório no GitHub** (se ainda não tiver)
-2. **Configurar o electron-builder.json** com suas informações:
+#### **Criar uma nova versão:**
+```bash
+# 1. Atualizar a versão no package.json
+npm version patch  # ou minor, major
 
-```json
-{
-  "publish": {
-    "provider": "github",
-    "owner": "seu-usuario-github",
-    "repo": "seu-repositorio"
-  }
-}
+# 2. Fazer push da tag para o GitHub
+git push origin v1.0.1
+
+# 3. O GitHub Actions irá automaticamente:
+#    - Fazer build para Windows, macOS e Linux
+#    - Criar um release no GitHub
+#    - Disponibilizar os arquivos para download
 ```
 
-3. **Atualizar a URL no main.js**:
+#### **Build manual:**
+```bash
+# Build local (sem publicar)
+npm run dist
 
+# Build e publicar no GitHub
+npm run release
+```
+
+### **2. Para Usuários:**
+
+#### **Atualização Automática:**
+- A aplicação verifica atualizações automaticamente a cada 24 horas
+- Quando uma atualização está disponível, aparece uma notificação discreta
+- O usuário pode escolher baixar e instalar quando quiser
+
+#### **Atualização Manual:**
+1. Vá para a aba "⚙️ Configurações"
+2. Na seção "🔄 Atualizações do Sistema"
+3. Clique em "🔍 Verificar Atualizações"
+4. Se houver atualização, clique em "📥 Baixar Atualização"
+5. Após o download, clique em "🔄 Instalar e Reiniciar"
+
+---
+
+## 🔧 **Configurações Avançadas:**
+
+### **Alterar frequência de verificação:**
+No arquivo `main.js`, linha 22:
 ```javascript
-const UPDATE_CONFIG = {
-    UPDATE_SERVER_URL: 'https://github.com/seu-usuario/seu-repositorio/releases/latest',
-    // ... outras configurações
-};
+CHECK_INTERVAL: 24 * 60 * 60 * 1000, // 24 horas (em milissegundos)
 ```
 
-### 2. Configuração do Token GitHub
+### **Habilitar download automático:**
+No arquivo `main.js`, linha 24:
+```javascript
+AUTO_DOWNLOAD: true, // true = baixa automaticamente, false = apenas notifica
+```
 
-Para publicar releases automaticamente, você precisa de um token GitHub:
+### **Alterar servidor de atualizações:**
+No arquivo `main.js`, linha 21:
+```javascript
+UPDATE_SERVER_URL: 'https://github.com/AlexandreSilvestrin/XY-task/releases/latest',
+```
 
+---
+
+## 📁 **Arquivos Modificados:**
+
+### **Configuração:**
+- `package.json` - Scripts de build e release
+- `electron-builder.json` - Configuração de publicação
+- `.github/workflows/build-and-release.yml` - GitHub Actions
+
+### **Código:**
+- `main.js` - Lógica de atualização automática
+- `preload.js` - APIs expostas para o frontend
+- `frontend/renderer.js` - Interface de atualização
+- `frontend/index.html` - Elementos da interface
+
+---
+
+## 🐛 **Solução de Problemas:**
+
+### **Erro: "Cannot find module 'electron-updater'"**
+```bash
+npm install electron-updater
+```
+
+### **Erro: "GitHub token not found"**
 1. Vá para GitHub → Settings → Developer settings → Personal access tokens
-2. Crie um token com permissões `repo` e `write:packages`
-3. Configure a variável de ambiente:
+2. Crie um token com permissões de `repo`
+3. Adicione como secret no repositório: `GITHUB_TOKEN`
 
-```bash
-# Windows
-set GH_TOKEN=seu_token_aqui
+### **Erro: "Release not found"**
+- Verifique se o repositório está configurado corretamente no `electron-builder.json`
+- Confirme se o owner e repo estão corretos
 
-# Linux/Mac
-export GH_TOKEN=seu_token_aqui
-```
+### **Atualização não aparece:**
+- Verifique se a versão no `package.json` é maior que a atual
+- Confirme se o release foi criado no GitHub
+- Verifique os logs no console da aplicação
 
-## 🚀 Como Publicar Atualizações
+---
 
-### 1. Preparar a Nova Versão
+## 🔒 **Segurança:**
 
-1. **Atualize a versão no package.json**:
-```json
-{
-  "version": "1.0.1"
-}
-```
+### **Verificação de integridade:**
+- Os arquivos são assinados digitalmente
+- Verificação automática de checksums
+- Download apenas de releases oficiais
 
-2. **Faça commit das mudanças**:
-```bash
-git add .
-git commit -m "Nova versão 1.0.1"
-git tag v1.0.1
-git push origin main --tags
-```
+### **Permissões necessárias:**
+- `repo` - Para criar releases
+- `write:packages` - Para publicar artefatos
 
-### 2. Build e Publicação
+---
 
-Execute o comando de build com publicação:
+## 📊 **Monitoramento:**
 
-```bash
-npm run build -- --publish=always
-```
+### **Logs de atualização:**
+- Console do Electron (F12)
+- Logs do sistema operacional
+- GitHub Actions logs
 
-Isso irá:
-- Fazer o build da aplicação
-- Criar uma release no GitHub
-- Fazer upload dos arquivos de instalação
-- Configurar automaticamente o sistema de atualizações
+### **Status da aplicação:**
+- Versão atual sempre visível na interface
+- Status de atualização em tempo real
+- Notificações discretas de progresso
 
-## 🎯 Como Funciona
+---
 
-### Verificação Automática
+## 🎯 **Próximos Passos:**
 
-- **Na inicialização**: Verifica atualizações 5 segundos após o app iniciar
-- **Manual**: Usuário pode clicar em "Verificar Atualizações" na aba Configurações
-- **Intervalo**: Configurado para verificar a cada 24 horas (modificável)
+1. **Testar o sistema** criando uma versão de teste
+2. **Configurar notificações** para releases
+3. **Implementar rollback** em caso de problemas
+4. **Adicionar métricas** de uso das atualizações
 
-### Fluxo de Atualização
+---
 
-1. **Verificação**: App verifica se há nova versão disponível
-2. **Notificação**: Se houver atualização, mostra diálogo para o usuário
-3. **Download**: Usuário escolhe baixar agora ou mais tarde
-4. **Instalação**: Após download, pergunta se quer instalar agora
-5. **Reinicialização**: App fecha e reinicia com a nova versão
+## 📞 **Suporte:**
 
-### Interface do Usuário
+Para problemas ou dúvidas:
+1. Verifique os logs da aplicação
+2. Consulte a documentação do electron-updater
+3. Abra uma issue no GitHub
 
-Na aba **Configurações**, você encontrará:
+---
 
-- **Versão Atual**: Mostra a versão instalada
-- **Status**: Estado atual da verificação
-- **Botões de Controle**:
-  - 🔍 Verificar Atualizações
-  - 📥 Baixar Atualização (quando disponível)
-  - 🔄 Instalar e Reiniciar (após download)
-- **Barra de Progresso**: Mostra progresso do download
-- **Mensagens**: Feedback visual do processo
-
-## ⚙️ Configurações Avançadas
-
-### Modificar Comportamento
-
-No arquivo `main.js`, você pode ajustar:
-
-```javascript
-const UPDATE_CONFIG = {
-    CHECK_INTERVAL: 24 * 60 * 60 * 1000, // Verificar a cada 24 horas
-    AUTO_DOWNLOAD: false, // Não baixar automaticamente
-    AUTO_INSTALL_ON_APP_QUIT: true // Instalar ao fechar
-};
-```
-
-### Configurações Disponíveis
-
-- `AUTO_DOWNLOAD`: Se `true`, baixa automaticamente quando encontra atualização
-- `AUTO_INSTALL_ON_APP_QUIT`: Se `true`, instala automaticamente ao fechar o app
-- `CHECK_INTERVAL`: Intervalo entre verificações (em milissegundos)
-
-## 🐛 Solução de Problemas
-
-### Erro: "Cannot find module 'electron-updater'"
-
-```bash
-npm install electron-updater --save
-```
-
-### Erro: "No update available"
-
-- Verifique se a versão no `package.json` é menor que a versão da release
-- Confirme se a release foi publicada corretamente no GitHub
-- Verifique se o token GitHub tem as permissões corretas
-
-### Erro: "Failed to check for updates"
-
-- Verifique sua conexão com a internet
-- Confirme se a URL do repositório está correta
-- Verifique se o repositório é público ou se o token tem acesso
-
-### Atualização não aparece
-
-1. Verifique se a nova versão é maior que a atual
-2. Confirme se os arquivos foram enviados para a release
-3. Aguarde alguns minutos (pode haver cache)
-
-## 📝 Logs e Debug
-
-### Habilitar Logs Detalhados
-
-Para debug, você pode adicionar logs no console:
-
-```javascript
-// No main.js
-autoUpdater.logger = require('electron-log');
-autoUpdater.logger.transports.file.level = 'debug';
-```
-
-### Verificar Logs
-
-Os logs aparecem no console do Electron (F12 → Console) e incluem:
-- Status da verificação
-- Progresso do download
-- Erros encontrados
-- Informações da versão
-
-## 🔒 Segurança
-
-### Assinatura de Código
-
-Para produção, configure a assinatura de código no `electron-builder.json`:
-
-```json
-{
-  "win": {
-    "certificateFile": "path/to/certificate.p12",
-    "certificatePassword": "password"
-  },
-  "mac": {
-    "identity": "Developer ID Application: Your Name"
-  }
-}
-```
-
-### Verificação de Integridade
-
-O electron-updater verifica automaticamente:
-- Assinatura digital dos arquivos
-- Integridade dos downloads
-- Compatibilidade da versão
-
-## 📚 Recursos Adicionais
-
-- [Documentação electron-updater](https://www.electron.build/auto-update)
-- [GitHub Releases API](https://docs.github.com/en/rest/releases)
-- [Electron Builder](https://www.electron.build/)
-
-## 🎉 Conclusão
-
-O sistema de atualizações está configurado e pronto para uso! 
-
-**Próximos passos:**
-1. Configure seu repositório GitHub
-2. Atualize as URLs nos arquivos de configuração
-3. Faça o primeiro build e release
-4. Teste o sistema de atualizações
-
-Para qualquer dúvida ou problema, consulte os logs do console ou a documentação oficial do electron-updater.
+**✅ Sistema de atualizações configurado com sucesso!**

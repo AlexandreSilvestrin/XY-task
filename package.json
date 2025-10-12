@@ -1,13 +1,15 @@
 {
   "name": "xy-task",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Aplicação XY-task - Electron + Python para transformação de arquivos",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
     "dev": "electron . --dev",
     "build": "electron-builder --config electron-builder.json",
-    "dist": "electron-builder --config electron-builder.json --publish=never"
+    "dist": "electron-builder --config electron-builder.json --publish=never",
+    "dist:publish": "electron-builder --config electron-builder.json --publish=always",
+    "release": "npm run dist:publish"
   },
   "keywords": [
     "electron",
