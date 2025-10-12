@@ -107,9 +107,12 @@ function setupEventListeners() {
     // Link do GitHub
     setupGitHubLink();
     
+    
     // Mudanças nos inputs
     elements.inputPath.addEventListener('change', updateUI);
     elements.outputFolder.addEventListener('change', updateUI);
+    
+    
 }
 
 // Seleção de arquivos e pastas
@@ -494,6 +497,16 @@ function setupTabs() {
         addTabBtn: addTabBtn ? 'encontrado' : 'não encontrado'
     });
     
+    // Debug: listar todas as abas encontradas
+    tabButtons.forEach((button, index) => {
+        const tabId = button.getAttribute('data-tab');
+        console.log(`📑 Aba ${index + 1}: ${tabId}`);
+    });
+    
+    tabContents.forEach((content, index) => {
+        console.log(`📑 Conteúdo ${index + 1}: ${content.id}`);
+    });
+    
     // Event listeners para as abas
     tabButtons.forEach(button => {
         button.addEventListener('click', () => {
@@ -512,6 +525,8 @@ function setupTabs() {
 }
 
 function switchTab(tabId) {
+    console.log(`🔄 Mudando para aba: ${tabId}`);
+    
     // Remover classe active de todas as abas
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
     document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
@@ -520,10 +535,19 @@ function switchTab(tabId) {
     const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
     const activeContent = document.getElementById(`tab-${tabId}`);
     
+    console.log(`🔍 Elementos encontrados:`, {
+        activeButton: activeButton ? 'encontrado' : 'não encontrado',
+        activeContent: activeContent ? 'encontrado' : 'não encontrado'
+    });
+    
     if (activeButton && activeContent) {
         activeButton.classList.add('active');
         activeContent.classList.add('active');
-        console.log(`📑 Aba ativada: ${tabId}`);
+        console.log(`✅ Aba ativada: ${tabId}`);
+    } else {
+        console.error(`❌ Erro ao ativar aba: ${tabId}`);
+        if (!activeButton) console.error(`❌ Botão não encontrado para: ${tabId}`);
+        if (!activeContent) console.error(`❌ Conteúdo não encontrado para: tab-${tabId}`);
     }
 }
 
@@ -590,12 +614,14 @@ function setupGitHubLink() {
     }
 }
 
+
 // ==================== SISTEMA DE ATUALIZAÇÕES ====================
 
 // Elementos DOM para atualizações
 const updateElements = {
     currentVersion: document.getElementById('currentVersion'),
     updateStatus: document.getElementById('updateStatus'),
+    mainCheckUpdatesBtn: document.getElementById('mainCheckUpdatesBtn'),
     checkUpdatesBtn: document.getElementById('checkUpdatesBtn'),
     downloadUpdateBtn: document.getElementById('downloadUpdateBtn'),
     installUpdateBtn: document.getElementById('installUpdateBtn'),
@@ -610,7 +636,8 @@ const versionElements = {
     notification: document.getElementById('versionNotification'),
     icon: document.getElementById('versionIcon'),
     text: document.getElementById('versionText'),
-    actionBtn: document.getElementById('versionActionBtn')
+    actionBtn: document.getElementById('versionActionBtn'),
+    checkBtn: document.getElementById('versionCheckBtn')
 };
 
 // Estado das atualizações
@@ -669,6 +696,14 @@ function setupVersionNotificationListeners() {
             handleVersionActionClick();
         });
     }
+    
+    // Botão de verificação de atualizações
+    if (versionElements.checkBtn) {
+        versionElements.checkBtn.addEventListener('click', () => {
+            console.log('🔄 Botão de verificação clicado');
+            checkForUpdates();
+        });
+    }
 }
 
 // Atualizar notificação de versão
@@ -685,6 +720,7 @@ function updateVersionNotification(status, version = null) {
             versionElements.icon.textContent = '✅';
             versionElements.text.textContent = `Atualizado v${version}`;
             versionElements.actionBtn.style.display = 'none';
+            versionElements.checkBtn.style.display = 'flex';
             versionElements.notification.classList.add('updated');
             break;
             
@@ -692,6 +728,7 @@ function updateVersionNotification(status, version = null) {
             versionElements.icon.textContent = '🔄';
             versionElements.text.textContent = 'Atualização pendente';
             versionElements.actionBtn.style.display = 'flex';
+            versionElements.checkBtn.style.display = 'none';
             versionElements.actionBtn.textContent = '📥';
             versionElements.actionBtn.title = 'Baixar atualização';
             versionElements.notification.classList.add('update-available');
@@ -701,6 +738,7 @@ function updateVersionNotification(status, version = null) {
             versionElements.icon.textContent = '📥';
             versionElements.text.textContent = 'Baixando atualização...';
             versionElements.actionBtn.style.display = 'none';
+            versionElements.checkBtn.style.display = 'none';
             versionElements.notification.classList.add('update-downloading');
             break;
             
@@ -708,6 +746,7 @@ function updateVersionNotification(status, version = null) {
             versionElements.icon.textContent = '🚀';
             versionElements.text.textContent = 'Atualização pronta!';
             versionElements.actionBtn.style.display = 'flex';
+            versionElements.checkBtn.style.display = 'none';
             versionElements.actionBtn.textContent = '🔄';
             versionElements.actionBtn.title = 'Instalar e reiniciar';
             versionElements.notification.classList.add('update-ready');
@@ -773,6 +812,14 @@ async function loadAppInfo() {
 
 // Configurar event listeners para atualizações
 function setupUpdateEventListeners() {
+    // Botão principal de verificar atualizações
+    if (updateElements.mainCheckUpdatesBtn) {
+        updateElements.mainCheckUpdatesBtn.addEventListener('click', () => {
+            console.log('🔍 Botão principal de verificação clicado');
+            checkForUpdates();
+        });
+    }
+    
     // Botão de verificar atualizações
     if (updateElements.checkUpdatesBtn) {
         updateElements.checkUpdatesBtn.addEventListener('click', () => {
@@ -808,8 +855,22 @@ function setupUpdateEventListeners() {
             console.log('📦 Atualização disponível:', info);
             updateState.updateAvailable = true;
             updateState.latestVersion = info.version;
+            updateState.isChecking = false;
             updateStatus(`Atualização disponível: v${info.version}`, 'success');
             showDownloadButton();
+            
+            // Restaurar botão principal
+            if (updateElements.mainCheckUpdatesBtn) {
+                updateElements.mainCheckUpdatesBtn.disabled = false;
+                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+            }
+            
+            // Restaurar botão de verificação na notificação
+            if (versionElements.checkBtn) {
+                versionElements.checkBtn.disabled = false;
+                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.title = 'Verificar atualizações';
+            }
             
             // Atualizar notificação de versão
             updateVersionNotification('available', info.version);
@@ -819,8 +880,22 @@ function setupUpdateEventListeners() {
         window.electronAPI.onUpdateNotAvailable((event, info) => {
             console.log('✅ Aplicação está atualizada:', info);
             updateState.updateAvailable = false;
+            updateState.isChecking = false;
             updateStatus('Aplicação está atualizada', 'success');
             hideUpdateButtons();
+            
+            // Restaurar botão principal
+            if (updateElements.mainCheckUpdatesBtn) {
+                updateElements.mainCheckUpdatesBtn.disabled = false;
+                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+            }
+            
+            // Restaurar botão de verificação na notificação
+            if (versionElements.checkBtn) {
+                versionElements.checkBtn.disabled = false;
+                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.title = 'Verificar atualizações';
+            }
             
             // Atualizar notificação de versão
             updateVersionNotification('updated', info.version || updateState.currentVersion);
@@ -831,6 +906,20 @@ function setupUpdateEventListeners() {
             console.error('❌ Erro ao verificar atualizações:', error);
             updateStatus(`Erro: ${error}`, 'error');
             updateState.isChecking = false;
+            
+            // Restaurar botão principal
+            if (updateElements.mainCheckUpdatesBtn) {
+                updateElements.mainCheckUpdatesBtn.disabled = false;
+                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+            }
+            
+            // Restaurar botão de verificação na notificação
+            if (versionElements.checkBtn) {
+                versionElements.checkBtn.disabled = false;
+                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.title = 'Verificar atualizações';
+            }
+            
             updateUI();
         });
         
@@ -868,6 +957,20 @@ async function checkForUpdates() {
         console.log('🔍 Verificando atualizações...');
         updateState.isChecking = true;
         updateStatus('Verificando atualizações...', 'info');
+        
+        // Atualizar botão principal
+        if (updateElements.mainCheckUpdatesBtn) {
+            updateElements.mainCheckUpdatesBtn.disabled = true;
+            updateElements.mainCheckUpdatesBtn.innerHTML = '⏳ Verificando...';
+        }
+        
+        // Atualizar botão de verificação na notificação
+        if (versionElements.checkBtn) {
+            versionElements.checkBtn.disabled = true;
+            versionElements.checkBtn.textContent = '⏳';
+            versionElements.checkBtn.title = 'Verificando...';
+        }
+        
         updateUI();
         
         if (window.electronAPI && window.electronAPI.checkForUpdates) {
@@ -878,6 +981,20 @@ async function checkForUpdates() {
         console.error('❌ Erro ao verificar atualizações:', error);
         updateStatus(`Erro: ${error.message}`, 'error');
         updateState.isChecking = false;
+        
+        // Restaurar botão principal
+        if (updateElements.mainCheckUpdatesBtn) {
+            updateElements.mainCheckUpdatesBtn.disabled = false;
+            updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+        }
+        
+        // Restaurar botão de verificação na notificação
+        if (versionElements.checkBtn) {
+            versionElements.checkBtn.disabled = false;
+            versionElements.checkBtn.textContent = '🔄';
+            versionElements.checkBtn.title = 'Verificar atualizações';
+        }
+        
         updateUI();
     }
 }
@@ -1011,6 +1128,9 @@ function hideProgressBar() {
 // Atualizar UI
 function updateUI() {
     // Atualizar estado dos botões
+    if (updateElements.mainCheckUpdatesBtn) {
+        updateElements.mainCheckUpdatesBtn.disabled = updateState.isChecking || updateState.isDownloading;
+    }
     if (updateElements.checkUpdatesBtn) {
         updateElements.checkUpdatesBtn.disabled = updateState.isChecking || updateState.isDownloading;
     }
@@ -1042,5 +1162,9 @@ document.addEventListener('DOMContentLoaded', function() {
         initializeUpdateSystem();
     }, 1000);
 });
+
+// ==================== FUNCIONALIDADES DAS ABAS ====================
+
+
 
 console.log('📱 Frontend carregado com sucesso!');

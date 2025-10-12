@@ -466,6 +466,21 @@ body::-webkit-scrollbar {
     box-shadow: 0 8px 25px rgba(72, 187, 120, 0.4);
 }
 
+.btn-large {
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 700;
+    min-width: 200px;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.btn-large:hover:not(:disabled) {
+    transform: translateY(-3px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+}
+
 .action-buttons {
     display: flex;
     gap: 15px;
@@ -859,6 +874,37 @@ body::-webkit-scrollbar {
     transform: scale(0.95);
 }
 
+.version-check-btn {
+    background: var(--bg-primary);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 6px 10px;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-width: 32px;
+    height: 28px;
+}
+
+.version-check-btn:hover {
+    background: var(--control-hover);
+    transform: scale(1.05);
+}
+
+.version-check-btn:active {
+    transform: scale(0.95);
+}
+
+.version-check-btn:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+}
+
 
 /* Animações para a notificação */
 @keyframes slideInLeft {
@@ -914,11 +960,34 @@ body::-webkit-scrollbar {
         min-width: 28px;
         height: 24px;
     }
+    
+    .version-check-btn {
+        font-size: 12px;
+        padding: 4px 8px;
+        min-width: 28px;
+        height: 24px;
+    }
 }
 
 /* Estilos para seção de atualizações */
 .update-section {
     margin-top: 20px;
+}
+
+.update-main-action {
+    text-align: center;
+    margin-bottom: 30px;
+    padding: 20px;
+    background: linear-gradient(135deg, rgba(115, 140, 252, 0.1), rgba(29, 27, 148, 0.1));
+    border-radius: 12px;
+    border: 2px dashed var(--border-color);
+}
+
+.update-description {
+    margin-top: 10px;
+    color: var(--text-muted);
+    font-size: 14px;
+    font-style: italic;
 }
 
 .update-info {
@@ -1014,4 +1083,31 @@ body::-webkit-scrollbar {
     background: rgba(255, 152, 0, 0.1);
     border: 1px solid rgba(255, 152, 0, 0.3);
     color: #ef6c00;
+}
+
+/* Estilos para placeholder de gráfico */
+.grafico-placeholder {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+    background: var(--input-bg);
+    border: 2px dashed var(--border-color);
+    border-radius: 12px;
+    padding: 40px;
+    text-align: center;
+    color: var(--text-muted);
+}
+
+.placeholder-icon {
+    font-size: 4rem;
+    margin-bottom: 20px;
+    opacity: 0.6;
+}
+
+.grafico-placeholder p {
+    font-size: 1.1rem;
+    line-height: 1.5;
+    max-width: 400px;
 }

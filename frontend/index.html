@@ -19,6 +19,9 @@
         <button class="version-action-btn" id="versionActionBtn" style="display: none;" title="Baixar atualização">
             📥
         </button>
+        <button class="version-check-btn" id="versionCheckBtn" title="Verificar atualizações">
+            🔄
+        </button>
     </div>
 
     <!-- Botões de controle flutuantes -->
@@ -42,15 +45,6 @@
             <div class="tabs-header">
                 <button class="tab-button active" data-tab="balancete">
                     📊 Balancete
-                </button>
-                <button class="tab-button" data-tab="conversao">
-                    🔄 Conversão
-                </button>
-                <button class="tab-button" data-tab="relatorios">
-                    📈 Relatórios
-                </button>
-                <button class="tab-button" data-tab="configuracoes">
-                    ⚙️ Configurações
                 </button>
                 <button class="tab-button add-tab-btn" id="addTabBtn" title="Adicionar nova aba">
                     ➕
@@ -121,139 +115,10 @@
                 <h2>✅ Resultado</h2>
                 <div id="resultContent"></div>
             </div>
-
-                </div>
-
-                <!-- Aba Conversão -->
-                <div class="tab-content" id="tab-conversao">
-                    <div class="main-content">
-                        <div class="card">
-                            <h2>🔄 Conversão de Arquivos</h2>
-                            <p>Converta arquivos entre diferentes formatos</p>
-                            <div class="input-group">
-                                <label for="conversaoInput">Arquivo para conversão:</label>
-                                <div class="file-input-container">
-                                    <input type="text" id="conversaoInput" placeholder="Selecione um arquivo..." readonly>
-                                    <button type="button" class="btn btn-secondary">📂 Selecionar</button>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label for="formatoSaida">Formato de saída:</label>
-                                <select id="formatoSaida" class="select-input">
-                                    <option value="pdf">PDF</option>
-                                    <option value="excel">Excel</option>
-                                    <option value="csv">CSV</option>
-                                    <option value="json">JSON</option>
-                                </select>
-                            </div>
-                            <div class="action-buttons">
-                                <button type="button" class="btn btn-primary">🔄 Converter</button>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
-                <!-- Aba Relatórios -->
-                <div class="tab-content" id="tab-relatorios">
-                    <div class="main-content">
-                        <div class="card">
-                            <h2>📈 Geração de Relatórios</h2>
-                            <p>Gere relatórios personalizados dos dados processados</p>
-                            <div class="input-group">
-                                <label for="periodoRelatorio">Período:</label>
-                                <div class="date-range">
-                                    <input type="date" id="dataInicio" class="date-input">
-                                    <span>até</span>
-                                    <input type="date" id="dataFim" class="date-input">
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label for="tipoRelatorio">Tipo de relatório:</label>
-                                <select id="tipoRelatorio" class="select-input">
-                                    <option value="mensal">Relatório Mensal</option>
-                                    <option value="trimestral">Relatório Trimestral</option>
-                                    <option value="anual">Relatório Anual</option>
-                                    <option value="personalizado">Relatório Personalizado</option>
-                                </select>
-                            </div>
-                            <div class="action-buttons">
-                                <button type="button" class="btn btn-primary">📊 Gerar Relatório</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
 
-                <!-- Aba Configurações -->
-                <div class="tab-content" id="tab-configuracoes">
-                    <div class="main-content">
-                        <div class="card">
-                            <h2>⚙️ Configurações do Sistema</h2>
-                            <div class="input-group">
-                                <label for="pastaPadrao">Pasta padrão de saída:</label>
-                                <div class="file-input-container">
-                                    <input type="text" id="pastaPadrao" placeholder="Selecione uma pasta..." readonly>
-                                    <button type="button" class="btn btn-secondary">📁 Selecionar</button>
-                                </div>
-                            </div>
-                            <div class="input-group">
-                                <label for="formatoPadrao">Formato padrão de saída:</label>
-                                <select id="formatoPadrao" class="select-input">
-                                    <option value="xlsx">Excel (.xlsx)</option>
-                                    <option value="csv">CSV (.csv)</option>
-                                    <option value="pdf">PDF (.pdf)</option>
-                                </select>
-                            </div>
-                            <div class="input-group">
-                                <label class="checkbox-label">
-                                    <input type="checkbox" id="backupAutomatico">
-                                    <span class="checkmark"></span>
-                                    Backup automático dos arquivos processados
-                                </label>
-                            </div>
-                            <div class="action-buttons">
-                                <button type="button" class="btn btn-primary">💾 Salvar Configurações</button>
-                            </div>
-                        </div>
-                        
-                        <!-- Seção de Atualizações -->
-                        <div class="card">
-                            <h2>🔄 Atualizações do Sistema</h2>
-                            <div class="update-section">
-                                <div class="update-info">
-                                    <div class="info-item">
-                                        <span class="label">Versão Atual:</span>
-                                        <span class="value" id="currentVersion">Carregando...</span>
-                                    </div>
-                                    <div class="info-item">
-                                        <span class="label">Status:</span>
-                                        <span class="value" id="updateStatus">Verificando...</span>
-                                    </div>
-                                </div>
-                                
-                                <div class="update-controls">
-                                    <button type="button" id="checkUpdatesBtn" class="btn btn-secondary">
-                                        🔍 Verificar Atualizações
-                                    </button>
-                                    <button type="button" id="downloadUpdateBtn" class="btn btn-primary" style="display: none;">
-                                        📥 Baixar Atualização
-                                    </button>
-                                    <button type="button" id="installUpdateBtn" class="btn btn-success" style="display: none;">
-                                        🔄 Instalar e Reiniciar
-                                    </button>
-                                </div>
-                                
-                                <div class="update-progress" id="updateProgress" style="display: none;">
-                                    <div class="progress-bar">
-                                        <div class="progress-fill" id="updateProgressFill"></div>
-                                    </div>
-                                    <div class="progress-text" id="updateProgressText">0%</div>
-                                </div>
-                                
-                                <div class="update-message" id="updateMessage"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
