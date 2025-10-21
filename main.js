@@ -58,9 +58,7 @@ autoUpdater.allowPrerelease = false;
 autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'AlexandreSilvestrin',
-    repo: 'XY-task',
-    private: false,
-    releaseType: 'release'
+    repo: 'XY-task'
 });
 
 // Configurar headers para evitar erro 406

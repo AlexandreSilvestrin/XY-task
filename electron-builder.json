@@ -33,12 +33,7 @@
     "publisherName": "Alexandre Silvestrin",
     "verifyUpdateCodeSignature": false,
     "compression": "maximum",
-    "artifactName": "${productName}-${version}-${arch}.${ext}",
-    "publish": {
-      "provider": "github",
-      "owner": "AlexandreSilvestrin",
-      "repo": "XY-task"
-    }
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "mac": {
     "target": "dmg",
@@ -65,12 +60,11 @@
     "provider": "github",
     "owner": "AlexandreSilvestrin",
     "repo": "XY-task",
-    "private": false,
-    "releaseType": "release"
+    "private": false
   },
   "asar": true,
   "npmRebuild": true,
   "buildDependenciesFromSource": false,
   "nodeGypRebuild": false,
-  "buildVersion": "1.0.14"
+  "buildVersion": "1.0.15"
 }
