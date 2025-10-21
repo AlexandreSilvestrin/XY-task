@@ -817,7 +817,7 @@ function updateVersionNotification(status, version = null) {
     
     switch (status) {
         case 'updated':
-            versionElements.icon.textContent = '🔄';
+            versionElements.icon.textContent = '✅';
             versionElements.text.textContent = `Atualizado v${version}`;
             versionElements.actionBtn.style.display = 'none';
             versionElements.checkBtn.style.display = 'flex';
