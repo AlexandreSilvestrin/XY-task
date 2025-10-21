@@ -1,15 +1,24 @@
 {
   "name": "xy-task",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "Aplicação XY-task - Electron + Python para transformação de arquivos",
   "main": "main.js",
   "scripts": {
     "start": "electron .",
-    "dev": "electron . --dev",
+    "dev": "NODE_ENV=development electron .",
     "build": "electron-builder --config electron-builder.json",
+    "build:win": "electron-builder --config electron-builder.json --win",
+    "build:mac": "electron-builder --config electron-builder.json --mac",
+    "build:linux": "electron-builder --config electron-builder.json --linux",
     "dist": "electron-builder --config electron-builder.json --publish=never",
+    "dist:win": "electron-builder --config electron-builder.json --win --publish=never",
+    "dist:mac": "electron-builder --config electron-builder.json --mac --publish=never",
+    "dist:linux": "electron-builder --config electron-builder.json --linux --publish=never",
     "dist:publish": "electron-builder --config electron-builder.json --publish=always",
-    "release": "npm run dist:publish"
+    "release": "npm run dist:publish",
+    "clean": "rimraf dist",
+    "rebuild": "npm run clean && npm run build",
+    "postinstall": "electron-builder install-app-deps"
   },
   "keywords": [
     "electron",
@@ -21,7 +30,8 @@
   "license": "MIT",
   "devDependencies": {
     "electron": "^28.0.0",
-    "electron-builder": "^24.13.3"
+    "electron-builder": "^24.13.3",
+    "rimraf": "^5.0.0"
   },
   "dependencies": {
     "axios": "^1.6.0",

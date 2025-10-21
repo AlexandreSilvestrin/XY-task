@@ -5,6 +5,28 @@ const { spawn } = require('child_process');
 const axios = require('axios');
 const { autoUpdater } = require('electron-updater');
 
+// Verificação de instância única
+const gotTheLock = app.requestSingleInstanceLock();
+
+if (!gotTheLock) {
+    console.log('⚠️ Aplicação já está em execução. Fechando nova instância...');
+    app.quit();
+} else {
+    // Configurar handler para quando uma segunda instância tentar abrir
+    app.on('second-instance', (event, commandLine, workingDirectory) => {
+        console.log('🔄 Segunda instância detectada, focando na janela existente...');
+        
+        // Se a janela principal existe, focar nela
+        if (mainWindow) {
+            if (mainWindow.isMinimized()) {
+                mainWindow.restore();
+            }
+            mainWindow.focus();
+            mainWindow.show();
+        }
+    });
+}
+
 // Configurações
 const CONFIG = {
     PORT: 5000,
@@ -48,6 +70,7 @@ autoUpdater.requestHeaders = {
 };
 
 let mainWindow;
+let splashWindow;
 let pythonProcess;
 let isPythonRunning = false;
 
@@ -76,19 +99,69 @@ function createWindow() {
         maximizable: true
     });
 
-    // Carregar o arquivo HTML
-    mainWindow.loadFile(path.join(__dirname, 'frontend', 'index.html'));
+    // Criar janela de splash screen pequena
+    createSplashWindow();
 
-    // Mostrar janela quando estiver pronta
-    mainWindow.once('ready-to-show', () => {
-        console.log('✅ Janela pronta para exibição');
-        mainWindow.show();
+    // Carregar a aplicação principal imediatamente (mas não mostrar)
+    loadMainApplication();
+}
+
+// Função para criar janela de splash pequena
+function createSplashWindow() {
+    console.log('🎨 Criando janela de splash...');
+    
+    splashWindow = new BrowserWindow({
+        width: 500,
+        height: 350,
+        minWidth: 500,
+        minHeight: 350,
+        maxWidth: 500,
+        maxHeight: 350,
+        webPreferences: {
+            nodeIntegration: false,
+            contextIsolation: true,
+            enableRemoteModule: false
+        },
+        icon: path.join(__dirname, 'assets', 'icon_pg.png'),
+        title: 'XY-task - Carregando...',
+        show: false,
+        frame: false,
+        titleBarStyle: 'hidden',
+        resizable: false,
+        minimizable: false,
+        maximizable: false,
+        alwaysOnTop: true,
+        skipTaskbar: true,
+        center: true
+    });
+
+    // Carregar splash screen
+    splashWindow.loadFile(path.join(__dirname, 'frontend', 'splash.html'));
+
+    // Mostrar splash quando estiver pronto
+    splashWindow.once('ready-to-show', () => {
+        console.log('✅ Splash screen pronto');
+        splashWindow.show();
+        splashWindow.center();
         
         // Focar na janela
         if (process.platform === 'darwin') {
             app.dock.show();
         }
     });
+
+    // Fechar splash e mostrar janela principal após delay
+    setTimeout(() => {
+        if (splashWindow) {
+            splashWindow.close();
+            splashWindow = null;
+        }
+        if (mainWindow) {
+            mainWindow.show();
+            mainWindow.center();
+            mainWindow.focus();
+        }
+    }, 2000);
 
     // Abrir DevTools em desenvolvimento
     if (process.env.NODE_ENV === 'development') {
@@ -118,6 +191,23 @@ function createWindow() {
             console.log('🚫 Navegação bloqueada para:', navigationUrl);
         }
     });
+}
+
+// Função para carregar a aplicação principal
+async function loadMainApplication() {
+    console.log('🚀 Carregando aplicação principal...');
+    
+    try {
+        // Carregar o HTML principal
+        await mainWindow.loadFile(path.join(__dirname, 'frontend', 'index.html'));
+        console.log('✅ Aplicação principal carregada');
+        
+        // Notificar o renderer que a aplicação está pronta
+        mainWindow.webContents.send('app-ready');
+        
+    } catch (error) {
+        console.error('❌ Erro ao carregar aplicação principal:', error);
+    }
 }
 
 // Event listeners do Auto-Updater
@@ -447,6 +537,18 @@ ipcMain.handle('get-app-info', () => {
     };
 });
 
+// Handler para iniciar Python sob demanda
+ipcMain.handle('start-python-server', async () => {
+    console.log('🐍 Iniciando servidor Python sob demanda...');
+    const success = await startPythonServer();
+    return { success, isRunning: isPythonRunning };
+});
+
+// Handler para verificar status do Python
+ipcMain.handle('check-python-status', () => {
+    return { isRunning: isPythonRunning };
+});
+
 // Handlers para controle da janela
 ipcMain.handle('window-close', () => {
     mainWindow.close();
@@ -754,26 +856,8 @@ app.whenReady().then(async () => {
     // Verificar processos órfãos na inicialização
     cleanupOrphanedProcesses();
     
-    // Iniciar servidor Python
-    const pythonStarted = await startPythonServer();
-    
-    if (!pythonStarted) {
-        console.error('❌ Falha ao iniciar servidor Python');
-        
-        // Mostrar erro para o usuário
-        dialog.showErrorBox(
-            'Erro de Inicialização',
-            'Não foi possível iniciar o servidor Python.\n\nVerifique se o Python está instalado e as dependências estão corretas.'
-        );
-        
-        app.quit();
-        return;
-    }
-    
-    // Criar janela principal
+    // Criar janela principal (sem iniciar Python automaticamente)
     createWindow();
-    
-    // Verificação automática removida - usuário deve verificar manualmente
     
     // Eventos específicos do macOS
     app.on('activate', () => {

@@ -12,7 +12,7 @@ const elements = {
     selectFileBtn: document.getElementById('selectFileBtn'),
     selectFolderBtn: document.getElementById('selectFolderBtn'),
     selectOutputFolderBtn: document.getElementById('selectOutputFolderBtn'),
-    processBtn: document.getElementById('processBtn'),
+    transformBtn: document.getElementById('transformBtn'),
     clearBtn: document.getElementById('clearBtn'),
     openFolderBtn: document.getElementById('openFolderBtn'),
     statusMessage: document.getElementById('statusMessage'),
@@ -43,6 +43,20 @@ document.addEventListener('DOMContentLoaded', function() {
     setupEventListeners();
     startServerHealthCheck();
     initializeUpdateLog();
+    
+    // Configurar listener para quando a aplicação estiver pronta
+    if (window.electronAPI && window.electronAPI.onAppReady) {
+        window.electronAPI.onAppReady(() => {
+            console.log('🚀 Aplicação principal carregada!');
+            // Inicializar funcionalidades que dependem da aplicação principal
+            initializePythonControl();
+            
+            // Iniciar servidor Python automaticamente após um pequeno delay
+            setTimeout(() => {
+                startPythonServerAutomatically();
+            }, 1000);
+        });
+    }
 });
 
 function initializeApp() {
@@ -67,8 +81,8 @@ function setupEventListeners() {
     elements.selectFolderBtn.addEventListener('click', selectFolder);
     elements.selectOutputFolderBtn.addEventListener('click', selectOutputFolder);
     
-    // Botão de processamento
-    elements.processBtn.addEventListener('click', processFile);
+    // Botão de transformar
+    elements.transformBtn.addEventListener('click', transformFile);
     
     // Botão de limpar
     elements.clearBtn.addEventListener('click', clearForm);
@@ -205,8 +219,8 @@ async function selectOutputFolder() {
     }
 }
 
-// Processamento do arquivo
-async function processFile() {
+// Transformação do arquivo
+async function transformFile() {
     if (!appState.selectedPath || !appState.selectedFolder) {
         showStatus('Selecione arquivo(s)/pasta e uma pasta de saída', 'error');
         return;
@@ -216,14 +230,36 @@ async function processFile() {
         return;
     }
     
+    // Verificar se o servidor Python está funcionando
+    if (!appState.serverOnline) {
+        showStatus('Servidor Python não está funcionando. Tentando iniciar...', 'warning');
+        
+        // Tentar iniciar o servidor Python
+        const pythonStarted = await startPythonServer();
+        if (!pythonStarted) {
+            showStatus('Erro: Não foi possível iniciar o servidor Python. Verifique as configurações.', 'error');
+            return;
+        }
+        
+        // Aguardar um pouco para o servidor ficar pronto
+        await new Promise(resolve => setTimeout(resolve, 2000));
+        
+        // Verificar novamente se está funcionando
+        const isServerOnline = await checkServerHealth();
+        if (!isServerOnline) {
+            showStatus('Erro: Servidor Python não respondeu após inicialização.', 'error');
+            return;
+        }
+    }
+    
     try {
         appState.isProcessing = true;
         updateUI();
         
-        showStatus('Processando arquivo(s) de balancete...', 'processing');
+        showStatus('Transformando arquivo(s) de balancete...', 'processing');
         showProgress(true);
         
-        console.log('⚡ Iniciando processamento...');
+        console.log('🔄 Iniciando transformação...');
         console.log('📁 Caminho de entrada:', appState.selectedPath);
         console.log('📂 Pasta de saída:', appState.selectedFolder);
         
@@ -246,10 +282,10 @@ async function processFile() {
             appState.lastOutputFolder = appState.selectedFolder;
             showStatus(data.message, 'success');
             showResult(data);
-            console.log('✅ Processamento concluído:', data);
+            console.log('✅ Transformação concluída:', data);
         } else {
-            showStatus(data.message || 'Erro no processamento', 'error');
-            console.error('❌ Erro no processamento:', data);
+            showStatus(data.message || 'Erro na transformação', 'error');
+            console.error('❌ Erro na transformação:', data);
         }
         
     } catch (error) {
@@ -274,12 +310,18 @@ async function checkServerHealth() {
             const data = await response.json();
             appState.serverOnline = true;
             console.log('✅ Servidor online:', data);
+            updateUI(); // Atualizar UI quando servidor estiver online
+            updateServerStatusDisplay(true); // Atualizar aba de configurações
+            return true;
         } else {
             throw new Error('Servidor não respondeu');
         }
     } catch (error) {
         appState.serverOnline = false;
         console.warn('⚠️ Servidor offline:', error.message);
+        updateUI(); // Atualizar UI quando servidor estiver offline
+        updateServerStatusDisplay(false); // Atualizar aba de configurações
+        return false;
     }
 }
 
@@ -290,17 +332,26 @@ function startServerHealthCheck() {
 
 // Atualização da interface
 function updateUI() {
-    const canProcess = appState.selectedPath && 
-                      appState.selectedFolder && 
-                      !appState.isProcessing && 
-                      appState.serverOnline;
+    // Botão sempre ativo, só desabilitar se estiver processando
+    const isProcessing = appState.isProcessing;
     
-    elements.processBtn.disabled = !canProcess;
+    elements.transformBtn.disabled = isProcessing;
     
-    if (appState.isProcessing) {
-        elements.processBtn.innerHTML = '<span class="loading"></span> Processando...';
+    if (isProcessing) {
+        elements.transformBtn.innerHTML = '<span class="loading"></span> Transformando...';
     } else {
-        elements.processBtn.innerHTML = '⚡ Processar Balancete';
+        elements.transformBtn.innerHTML = '🔄 Transformar Balancete';
+    }
+    
+    // Botão sempre com aparência ativa quando não está processando
+    elements.transformBtn.style.opacity = '1';
+    elements.transformBtn.style.cursor = 'pointer';
+    
+    // Atualizar mensagem de status
+    if (isProcessing) {
+        showStatus('Transformando...', 'processing');
+    } else {
+        showStatus('Clique em "Transformar Balancete" para começar!', 'info');
     }
 }
 
@@ -546,6 +597,12 @@ function switchTab(tabId) {
         activeButton.classList.add('active');
         activeContent.classList.add('active');
         console.log(`✅ Aba ativada: ${tabId}`);
+        
+        // Se for a aba de configurações, atualizar informações
+        if (tabId === 'configuracoes') {
+            console.log('⚙️ Atualizando informações da aba de configurações...');
+            loadAppInfo();
+        }
     } else {
         console.error(`❌ Erro ao ativar aba: ${tabId}`);
         if (!activeButton) console.error(`❌ Botão não encontrado para: ${tabId}`);
@@ -686,26 +743,66 @@ function initializeVersionNotification() {
     // Configurar event listeners da notificação
     setupVersionNotificationListeners();
     
-    // Mostrar status inicial (discreto)
-    updateVersionNotification('updated', updateState.currentVersion || '1.0.0');
+    // Mostrar status inicial com ícone de setas girando
+    updateVersionNotification('updated', updateState.currentVersion || '1.0.8');
 }
 
 // Configurar event listeners da notificação
 function setupVersionNotificationListeners() {
     // Botão de ação (download)
     if (versionElements.actionBtn) {
-        versionElements.actionBtn.addEventListener('click', () => {
+        versionElements.actionBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             handleVersionActionClick();
         });
     }
     
     // Botão de verificação de atualizações
     if (versionElements.checkBtn) {
-        versionElements.checkBtn.addEventListener('click', () => {
+        versionElements.checkBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             console.log('🔄 Botão de verificação clicado');
             addUpdateLogEntry('🔄 Botão de verificação clicado pelo usuário', 'info');
             checkForUpdates();
         });
+    }
+    
+    // Tornar a notificação inteira clicável
+    if (versionElements.notification) {
+        versionElements.notification.addEventListener('click', () => {
+            console.log('🔔 Notificação clicada');
+            handleNotificationClick();
+        });
+    }
+}
+
+// Lidar com clique na notificação
+function handleNotificationClick() {
+    switch (versionNotificationState.currentStatus) {
+        case 'updated':
+            // Se está atualizado, verificar novamente
+            console.log('🔄 Verificando atualizações via clique na notificação...');
+            addUpdateLogEntry('🔄 Verificação iniciada via clique na notificação', 'info');
+            checkForUpdates();
+            break;
+        case 'available':
+            // Se há atualização disponível, baixar
+            console.log('📥 Baixando atualização via clique na notificação...');
+            addUpdateLogEntry('📥 Download iniciado via clique na notificação', 'info');
+            downloadUpdate();
+            break;
+        case 'ready':
+            // Se está pronta, instalar
+            console.log('🚀 Instalando atualização via clique na notificação...');
+            addUpdateLogEntry('🚀 Instalação iniciada via clique na notificação', 'info');
+            installUpdate();
+            break;
+        default:
+            // Para outros estados, verificar atualizações
+            console.log('🔄 Verificando atualizações via clique na notificação...');
+            addUpdateLogEntry('🔄 Verificação iniciada via clique na notificação', 'info');
+            checkForUpdates();
+            break;
     }
 }
 
@@ -720,29 +817,35 @@ function updateVersionNotification(status, version = null) {
     
     switch (status) {
         case 'updated':
-            versionElements.icon.textContent = '✅';
+            versionElements.icon.textContent = '🔄';
             versionElements.text.textContent = `Atualizado v${version}`;
             versionElements.actionBtn.style.display = 'none';
             versionElements.checkBtn.style.display = 'flex';
+            versionElements.checkBtn.textContent = '🔄';
+            versionElements.checkBtn.title = 'Verificar atualizações';
             versionElements.notification.classList.add('updated');
+            // Tornar clicável
+            versionElements.notification.style.cursor = 'pointer';
             break;
             
         case 'available':
-            versionElements.icon.textContent = '🔄';
-            versionElements.text.textContent = 'Atualização pendente';
+            versionElements.icon.textContent = '📥';
+            versionElements.text.textContent = 'Atualização disponível';
             versionElements.actionBtn.style.display = 'flex';
             versionElements.checkBtn.style.display = 'none';
             versionElements.actionBtn.textContent = '📥';
             versionElements.actionBtn.title = 'Baixar atualização';
             versionElements.notification.classList.add('update-available');
+            versionElements.notification.style.cursor = 'pointer';
             break;
             
         case 'downloading':
-            versionElements.icon.textContent = '📥';
+            versionElements.icon.textContent = '⏳';
             versionElements.text.textContent = 'Baixando atualização...';
             versionElements.actionBtn.style.display = 'none';
             versionElements.checkBtn.style.display = 'none';
             versionElements.notification.classList.add('update-downloading');
+            versionElements.notification.style.cursor = 'default';
             break;
             
         case 'ready':
@@ -753,6 +856,16 @@ function updateVersionNotification(status, version = null) {
             versionElements.actionBtn.textContent = '🔄';
             versionElements.actionBtn.title = 'Instalar e reiniciar';
             versionElements.notification.classList.add('update-ready');
+            versionElements.notification.style.cursor = 'pointer';
+            break;
+            
+        case 'checking':
+            versionElements.icon.textContent = '⏳';
+            versionElements.text.textContent = 'Verificando atualizações...';
+            versionElements.actionBtn.style.display = 'none';
+            versionElements.checkBtn.style.display = 'none';
+            versionElements.notification.classList.add('update-downloading');
+            versionElements.notification.style.cursor = 'default';
             break;
     }
     
@@ -965,6 +1078,9 @@ async function checkForUpdates() {
         
         updateState.isChecking = true;
         updateStatus('Verificando atualizações...', 'info');
+        
+        // Atualizar notificação para mostrar ampulheta
+        updateVersionNotification('checking');
         
         // Atualizar botão principal
         if (updateElements.mainCheckUpdatesBtn) {
@@ -1442,13 +1558,21 @@ async function loadAppInfo() {
             if (currentVersionEl) currentVersionEl.textContent = appInfo.version || 'Desconhecida';
             if (platformEl) platformEl.textContent = appInfo.platform || 'Desconhecida';
             if (architectureEl) architectureEl.textContent = appInfo.arch || 'Desconhecida';
-            if (serverStatusEl) {
-                serverStatusEl.textContent = appInfo.pythonRunning ? '🟢 Online' : '🔴 Offline';
-                serverStatusEl.style.color = appInfo.pythonRunning ? '#4caf50' : '#f44336';
-            }
+            
+            // Atualizar status do servidor
+            updateServerStatusDisplay(appInfo.pythonRunning);
         }
     } catch (error) {
         console.error('❌ Erro ao carregar informações da aplicação:', error);
+    }
+}
+
+// Atualizar exibição do status do servidor
+function updateServerStatusDisplay(isRunning) {
+    const serverStatusEl = document.getElementById('serverStatus');
+    if (serverStatusEl) {
+        serverStatusEl.textContent = isRunning ? '🟢 Online' : '🔴 Offline';
+        serverStatusEl.style.color = isRunning ? '#4caf50' : '#f44336';
     }
 }
 
@@ -1465,5 +1589,201 @@ function loadConfigSettings() {
 }
 
 // Funções de configuração simplificadas removidas
+
+// ==================== CONTROLE DO PYTHON ====================
+
+// Inicializar controle do Python
+function initializePythonControl() {
+    console.log('🐍 Inicializando controle do Python...');
+    
+    // Verificar status inicial do Python
+    checkPythonStatus();
+    
+    // Configurar botões de controle do Python se existirem
+    setupPythonControlButtons();
+}
+
+// Iniciar servidor Python automaticamente
+async function startPythonServerAutomatically() {
+    console.log('🐍 Iniciando servidor Python automaticamente...');
+    
+    try {
+        // Verificar se já está rodando
+        const isRunning = await checkPythonStatus();
+        if (isRunning) {
+            console.log('✅ Servidor Python já está rodando');
+            return true;
+        }
+        
+        // Tentar iniciar o servidor
+        const result = await startPythonServer();
+        if (result) {
+            console.log('✅ Servidor Python iniciado automaticamente');
+            return true;
+        } else {
+            console.warn('⚠️ Falha ao iniciar servidor Python automaticamente');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao iniciar servidor Python automaticamente:', error);
+        return false;
+    }
+}
+
+// Verificar status do Python
+async function checkPythonStatus() {
+    try {
+        if (window.electronAPI && window.electronAPI.checkPythonStatus) {
+            const status = await window.electronAPI.checkPythonStatus();
+            console.log('🐍 Status do Python:', status);
+            
+            // Atualizar estado do servidor
+            appState.serverOnline = status.isRunning;
+            
+            // Atualizar interface com o status
+            updatePythonStatusUI(status.isRunning);
+            updateUI(); // Atualizar UI geral
+            
+            // Atualizar status na aba de configurações
+            updateServerStatusDisplay(status.isRunning);
+            
+            return status.isRunning;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao verificar status do Python:', error);
+        appState.serverOnline = false;
+        updateUI();
+        updateServerStatusDisplay(false);
+        return false;
+    }
+}
+
+// Iniciar servidor Python manualmente
+async function startPythonServer() {
+    try {
+        console.log('🐍 Iniciando servidor Python...');
+        showStatus('Iniciando servidor Python...', 'info');
+        
+        if (window.electronAPI && window.electronAPI.startPythonServer) {
+            const result = await window.electronAPI.startPythonServer();
+            
+            if (result.success) {
+                console.log('✅ Servidor Python iniciado com sucesso');
+                showStatus('Servidor Python iniciado!', 'success');
+                appState.serverOnline = true;
+                updatePythonStatusUI(true);
+                updateUI(); // Atualizar UI geral
+                updateServerStatusDisplay(true); // Atualizar aba de configurações
+                return true;
+            } else {
+                console.error('❌ Falha ao iniciar servidor Python');
+                showStatus('Falha ao iniciar servidor Python', 'error');
+                appState.serverOnline = false;
+                updateUI();
+                updateServerStatusDisplay(false); // Atualizar aba de configurações
+                return false;
+            }
+        } else {
+            console.error('❌ API do Python não disponível');
+            showStatus('API do Python não disponível', 'error');
+            appState.serverOnline = false;
+            updateUI();
+            updateServerStatusDisplay(false); // Atualizar aba de configurações
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao iniciar servidor Python:', error);
+        showStatus('Erro ao iniciar servidor Python: ' + error.message, 'error');
+        appState.serverOnline = false;
+        updateUI();
+        updateServerStatusDisplay(false); // Atualizar aba de configurações
+        return false;
+    }
+}
+
+// Parar servidor Python
+async function stopPythonServer() {
+    try {
+        console.log('🛑 Parando servidor Python...');
+        showStatus('Parando servidor Python...', 'info');
+        
+        if (window.electronAPI && window.electronAPI.forceStopPython) {
+            const result = await window.electronAPI.forceStopPython();
+            
+            if (result.success) {
+                console.log('✅ Servidor Python parado com sucesso');
+                showStatus('Servidor Python parado!', 'success');
+                appState.serverOnline = false;
+                updatePythonStatusUI(false);
+                updateUI(); // Atualizar UI geral
+                updateServerStatusDisplay(false); // Atualizar aba de configurações
+                return true;
+            } else {
+                console.error('❌ Falha ao parar servidor Python');
+                showStatus('Falha ao parar servidor Python', 'error');
+                return false;
+            }
+        } else {
+            console.error('❌ API do Python não disponível');
+            showStatus('API do Python não disponível', 'error');
+            return false;
+        }
+    } catch (error) {
+        console.error('❌ Erro ao parar servidor Python:', error);
+        showStatus('Erro ao parar servidor Python: ' + error.message, 'error');
+        return false;
+    }
+}
+
+// Configurar botões de controle do Python
+function setupPythonControlButtons() {
+    // Procurar por botões de controle do Python na interface
+    const startPythonBtn = document.getElementById('startPythonBtn');
+    const stopPythonBtn = document.getElementById('stopPythonBtn');
+    const pythonStatusIndicator = document.getElementById('pythonStatusIndicator');
+    
+    if (startPythonBtn) {
+        startPythonBtn.addEventListener('click', async () => {
+            await startPythonServer();
+        });
+    }
+    
+    if (stopPythonBtn) {
+        stopPythonBtn.addEventListener('click', async () => {
+            await stopPythonServer();
+        });
+    }
+    
+    // Atualizar status inicial
+    checkPythonStatus().then(isRunning => {
+        updatePythonStatusUI(isRunning);
+    });
+}
+
+// Atualizar interface do status do Python
+function updatePythonStatusUI(isRunning) {
+    const pythonStatusIndicator = document.getElementById('pythonStatusIndicator');
+    const startPythonBtn = document.getElementById('startPythonBtn');
+    const stopPythonBtn = document.getElementById('stopPythonBtn');
+    
+    if (pythonStatusIndicator) {
+        pythonStatusIndicator.textContent = isRunning ? '🟢 Online' : '🔴 Offline';
+        pythonStatusIndicator.style.color = isRunning ? '#4caf50' : '#f44336';
+    }
+    
+    if (startPythonBtn) {
+        startPythonBtn.disabled = isRunning;
+        startPythonBtn.style.display = isRunning ? 'none' : 'inline-block';
+    }
+    
+    if (stopPythonBtn) {
+        stopPythonBtn.disabled = !isRunning;
+        stopPythonBtn.style.display = isRunning ? 'inline-block' : 'none';
+    }
+    
+    // Atualizar status do servidor na aplicação
+    appState.serverOnline = isRunning;
+    updateUI();
+}
 
 console.log('📱 Frontend carregado com sucesso!');

@@ -25,17 +25,21 @@
     "target": "nsis",
     "icon": "assets/icon_pg.ico",
     "publisherName": "Alexandre Silvestrin",
-    "verifyUpdateCodeSignature": false
+    "verifyUpdateCodeSignature": false,
+    "compression": "maximum",
+    "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
   "mac": {
     "target": "dmg",
     "icon": "assets/icon_pg.png",
-    "category": "public.app-category.productivity"
+    "category": "public.app-category.productivity",
+    "compression": "maximum"
   },
   "linux": {
     "target": "AppImage",
     "icon": "assets/icon_pg.png",
-    "category": "Office"
+    "category": "Office",
+    "compression": "maximum"
   },
   "nsis": {
     "oneClick": false,
@@ -43,7 +47,8 @@
     "createDesktopShortcut": true,
     "createStartMenuShortcut": true,
     "installerIcon": "assets/icon_pg.ico",
-    "uninstallerIcon": "assets/icon_pg.ico"
+    "uninstallerIcon": "assets/icon_pg.ico",
+    "deleteAppDataOnUninstall": false
   },
   "publish": {
     "provider": "github",
@@ -51,6 +56,9 @@
     "repo": "XY-task",
     "private": false
   },
-  "asar": false,
-  "npmRebuild": true
+  "asar": true,
+  "npmRebuild": true,
+  "buildDependenciesFromSource": false,
+  "nodeGypRebuild": false,
+  "buildVersion": "1.0.8"
 }

@@ -784,6 +784,19 @@ body::-webkit-scrollbar {
     backdrop-filter: blur(10px);
     background: rgba(255, 255, 255, 0.9);
     opacity: 0.7;
+    cursor: pointer;
+    user-select: none;
+}
+
+.version-notification:hover {
+    opacity: 1;
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.version-notification:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
 }
 
 [data-theme="dark"] .version-notification {

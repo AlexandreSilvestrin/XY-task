@@ -21,6 +21,14 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Informações da aplicação
     getAppInfo: () => ipcRenderer.invoke('get-app-info'),
     
+    // Controle do servidor Python
+    startPythonServer: () => ipcRenderer.invoke('start-python-server'),
+    checkPythonStatus: () => ipcRenderer.invoke('check-python-status'),
+    forceStopPython: () => ipcRenderer.invoke('force-stop-python'),
+    
+    // Eventos da aplicação
+    onAppReady: (callback) => ipcRenderer.on('app-ready', callback),
+    
     // Controle de atualizações
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
     downloadUpdate: () => ipcRenderer.invoke('download-update'),
