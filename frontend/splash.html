@@ -164,9 +164,19 @@
         </div>
     </div>
 
-    <div class="version">v1.0.8</div>
+    <div class="version" id="version">v1.0.13</div>
 
     <script>
+        // Capturar versão da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const version = urlParams.get('version') || '1.0.13';
+        
+        // Atualizar versão no DOM
+        const versionElement = document.getElementById('version');
+        if (versionElement) {
+            versionElement.textContent = `v${version}`;
+        }
+        
         // Simular progresso de carregamento
         const statusText = document.querySelector('.status-text');
         const loadingText = document.querySelector('.loading-text');

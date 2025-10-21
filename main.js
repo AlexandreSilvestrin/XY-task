@@ -51,16 +51,16 @@ const UPDATE_CONFIG = {
 autoUpdater.autoDownload = UPDATE_CONFIG.AUTO_DOWNLOAD;
 autoUpdater.autoInstallOnAppQuit = UPDATE_CONFIG.AUTO_INSTALL_ON_APP_QUIT;
 
-// Força aceitar update não assinado (para uso interno)
-autoUpdater.allowPrerelease = true;
-autoUpdater.forceDevUpdateConfig = true;
+// Configurações para updates não assinados
+autoUpdater.allowPrerelease = false;
 
 // Configurar o servidor de atualizações corretamente
 autoUpdater.setFeedURL({
     provider: 'github',
     owner: 'AlexandreSilvestrin',
     repo: 'XY-task',
-    private: false
+    private: false,
+    releaseType: 'release'
 });
 
 // Configurar headers para evitar erro 406
@@ -135,8 +135,11 @@ function createSplashWindow() {
         center: true
     });
 
-    // Carregar splash screen
-    splashWindow.loadFile(path.join(__dirname, 'frontend', 'splash.html'));
+    // Carregar splash screen com versão
+    const version = require('./package.json').version;
+    splashWindow.loadFile(path.join(__dirname, 'frontend', 'splash.html'), {
+        query: { version: version }
+    });
 
     // Mostrar splash quando estiver pronto
     splashWindow.once('ready-to-show', () => {

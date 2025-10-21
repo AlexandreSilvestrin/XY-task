@@ -1,6 +1,6 @@
 {
   "name": "xy-task",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Aplicação XY-task - Electron + Python para transformação de arquivos",
   "main": "main.js",
   "scripts": {
