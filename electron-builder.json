@@ -9,6 +9,7 @@
     "preload.js",
     "package.json",
     "frontend/**/*",
+    "assets/**/*",
     "node_modules/axios/**/*",
     "node_modules/axios/**/*.js",
     "node_modules/axios/**/*.json",
@@ -19,6 +20,11 @@
       "from": "backend/",
       "to": "backend/",
       "filter": ["**/*"]
+    },
+    {
+      "from": "assets/",
+      "to": "assets/",
+      "filter": ["**/*"]
     }
   ],
   "win": {
@@ -27,7 +33,12 @@
     "publisherName": "Alexandre Silvestrin",
     "verifyUpdateCodeSignature": false,
     "compression": "maximum",
-    "artifactName": "${productName}-${version}-${arch}.${ext}"
+    "artifactName": "${productName}-${version}-${arch}.${ext}",
+    "publish": {
+      "provider": "github",
+      "owner": "AlexandreSilvestrin",
+      "repo": "XY-task"
+    }
   },
   "mac": {
     "target": "dmg",
@@ -54,11 +65,12 @@
     "provider": "github",
     "owner": "AlexandreSilvestrin",
     "repo": "XY-task",
-    "private": false
+    "private": false,
+    "releaseType": "release"
   },
   "asar": true,
   "npmRebuild": true,
   "buildDependenciesFromSource": false,
   "nodeGypRebuild": false,
-  "buildVersion": "1.0.8"
+  "buildVersion": "1.0.11"
 }
