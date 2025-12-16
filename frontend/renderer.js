@@ -534,7 +534,9 @@ function applyTheme(theme) {
 function updateThemeIcon() {
     const themeIcon = elements.themeToggleBtn.querySelector('.theme-icon');
     if (themeIcon) {
-        themeIcon.textContent = appState.currentTheme === 'light' ? '' : '';
+        // Mostra 🌙 quando está em light mode (para mudar para dark)
+        // Mostra ☀️ quando está em dark mode (para mudar para light)
+        themeIcon.textContent = appState.currentTheme === 'light' ? '🌙' : '☀️';
     }
 }
 
@@ -815,7 +817,7 @@ function updateVersionNotification(status, version = null) {
     
     switch (status) {
         case 'updated':
-            versionElements.icon.textContent = '';
+            versionElements.icon.textContent = '✅';
             versionElements.text.textContent = `Atualizado v${version}`;
             versionElements.actionBtn.style.display = 'none';
             versionElements.checkBtn.style.display = 'flex';
@@ -827,7 +829,7 @@ function updateVersionNotification(status, version = null) {
             break;
             
         case 'available':
-            versionElements.icon.textContent = '';
+            versionElements.icon.textContent = '🔄';
             versionElements.text.textContent = 'Atualização disponível';
             versionElements.actionBtn.style.display = 'flex';
             versionElements.checkBtn.style.display = 'none';
@@ -847,7 +849,7 @@ function updateVersionNotification(status, version = null) {
             break;
             
         case 'ready':
-            versionElements.icon.textContent = '';
+            versionElements.icon.textContent = '🎉';
             versionElements.text.textContent = 'Atualização pronta!';
             versionElements.actionBtn.style.display = 'flex';
             versionElements.checkBtn.style.display = 'none';
