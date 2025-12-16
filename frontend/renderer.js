@@ -47,7 +47,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Configurar listener para quando a aplicação estiver pronta
     if (window.electronAPI && window.electronAPI.onAppReady) {
         window.electronAPI.onAppReady(() => {
-            console.log('🚀 Aplicação principal carregada!');
+            console.log(' Aplicação principal carregada!');
             // Inicializar funcionalidades que dependem da aplicação principal
             initializePythonControl();
             
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 
 function initializeApp() {
-    console.log('🚀 Inicializando aplicação...');
+    console.log(' Inicializando aplicação...');
     loadTheme();
     updateUI();
     checkServerHealth();
@@ -68,8 +68,8 @@ function initializeApp() {
 }
 
 function setupEventListeners() {
-    console.log('🔧 Configurando event listeners...');
-    console.log('🔍 Elementos encontrados:', {
+    console.log(' Configurando event listeners...');
+    console.log(' Elementos encontrados:', {
         minimizeBtn: elements.minimizeBtn ? 'encontrado' : 'não encontrado',
         maximizeBtn: elements.maximizeBtn ? 'encontrado' : 'não encontrado',
         closeBtn: elements.closeBtn ? 'encontrado' : 'não encontrado',
@@ -93,21 +93,21 @@ function setupEventListeners() {
     // Botões da barra de título
     if (elements.minimizeBtn) {
         elements.minimizeBtn.addEventListener('click', () => {
-            console.log('🪟 Minimizando janela...');
+            console.log(' Minimizando janela...');
             window.electronAPI.minimizeWindow();
         });
     }
     
     if (elements.maximizeBtn) {
         elements.maximizeBtn.addEventListener('click', () => {
-            console.log('🪟 Maximizando janela...');
+            console.log(' Maximizando janela...');
             window.electronAPI.maximizeWindow();
         });
     }
     
     if (elements.closeBtn) {
         elements.closeBtn.addEventListener('click', () => {
-            console.log('🪟 Fechando janela...');
+            console.log(' Fechando janela...');
             window.electronAPI.closeWindow();
         });
     }
@@ -134,7 +134,7 @@ function setupEventListeners() {
 // Seleção de arquivos e pastas
 async function selectFile() {
     try {
-        console.log('📂 Abrindo seletor de arquivo...');
+        console.log(' Abrindo seletor de arquivo...');
         
         // Usar API do Electron para seleção de arquivo
         const result = await window.electronAPI.selectFile();
@@ -145,18 +145,18 @@ async function selectFile() {
             appState.selectedPath = filePath;
             updateUI();
             
-            console.log('✅ Arquivo selecionado:', filePath);
+            console.log(' Arquivo selecionado:', filePath);
         }
     } catch (error) {
-        console.error('❌ Erro ao selecionar arquivo:', error);
+        console.error(' Erro ao selecionar arquivo:', error);
         showStatus('Erro ao selecionar arquivo', 'error');
     }
 }
 
 async function selectFolder() {
     try {
-        console.log('📁 Abrindo seletor de pasta de entrada...');
-        console.log('🔍 Verificando API do Electron:', window.electronAPI);
+        console.log(' Abrindo seletor de pasta de entrada...');
+        console.log(' Verificando API do Electron:', window.electronAPI);
         
         if (!window.electronAPI) {
             throw new Error('API do Electron não está disponível');
@@ -168,7 +168,7 @@ async function selectFolder() {
         
         // Usar API do Electron para seleção de pasta
         const result = await window.electronAPI.selectFolder();
-        console.log('📁 Resultado da seleção:', result);
+        console.log(' Resultado da seleção:', result);
         
         if (result && result.filePaths && result.filePaths.length > 0) {
             const folderPath = result.filePaths[0];
@@ -176,20 +176,20 @@ async function selectFolder() {
             appState.selectedPath = folderPath;
             updateUI();
             
-            console.log('✅ Pasta de entrada selecionada:', folderPath);
+            console.log(' Pasta de entrada selecionada:', folderPath);
         } else {
-            console.log('ℹ️ Seleção cancelada pelo usuário');
+            console.log(' Seleção cancelada pelo usuário');
         }
     } catch (error) {
-        console.error('❌ Erro ao selecionar pasta:', error);
+        console.error(' Erro ao selecionar pasta:', error);
         showStatus('Erro ao selecionar pasta: ' + error.message, 'error');
     }
 }
 
 async function selectOutputFolder() {
     try {
-        console.log('📁 Abrindo seletor de pasta de saída...');
-        console.log('🔍 Verificando API do Electron:', window.electronAPI);
+        console.log(' Abrindo seletor de pasta de saída...');
+        console.log(' Verificando API do Electron:', window.electronAPI);
         
         if (!window.electronAPI) {
             throw new Error('API do Electron não está disponível');
@@ -201,7 +201,7 @@ async function selectOutputFolder() {
         
         // Usar API do Electron para seleção de pasta de saída
         const result = await window.electronAPI.selectOutputFolder();
-        console.log('📁 Resultado da seleção:', result);
+        console.log(' Resultado da seleção:', result);
         
         if (result && result.filePaths && result.filePaths.length > 0) {
             const folderPath = result.filePaths[0];
@@ -209,12 +209,12 @@ async function selectOutputFolder() {
             appState.selectedFolder = folderPath;
             updateUI();
             
-            console.log('✅ Pasta de saída selecionada:', folderPath);
+            console.log(' Pasta de saída selecionada:', folderPath);
         } else {
-            console.log('ℹ️ Seleção cancelada pelo usuário');
+            console.log(' Seleção cancelada pelo usuário');
         }
     } catch (error) {
-        console.error('❌ Erro ao selecionar pasta de saída:', error);
+        console.error(' Erro ao selecionar pasta de saída:', error);
         showStatus('Erro ao selecionar pasta de saída: ' + error.message, 'error');
     }
 }
@@ -259,9 +259,9 @@ async function transformFile() {
         showStatus('Transformando arquivo(s) de balancete...', 'processing');
         showProgress(true);
         
-        console.log('🔄 Iniciando transformação...');
-        console.log('📁 Caminho de entrada:', appState.selectedPath);
-        console.log('📂 Pasta de saída:', appState.selectedFolder);
+        console.log(' Iniciando transformação...');
+        console.log(' Caminho de entrada:', appState.selectedPath);
+        console.log(' Pasta de saída:', appState.selectedFolder);
         
         const response = await fetch(`${CONFIG.API_BASE_URL}/process-file`, {
             method: 'POST',
@@ -282,14 +282,14 @@ async function transformFile() {
             appState.lastOutputFolder = appState.selectedFolder;
             showStatus(data.message, 'success');
             showResult(data);
-            console.log('✅ Transformação concluída:', data);
+            console.log(' Transformação concluída:', data);
         } else {
             showStatus(data.message || 'Erro na transformação', 'error');
-            console.error('❌ Erro na transformação:', data);
+            console.error(' Erro na transformação:', data);
         }
         
     } catch (error) {
-        console.error('❌ Erro na requisição:', error);
+        console.error(' Erro na requisição:', error);
         showStatus('Erro de comunicação com o servidor', 'error');
     } finally {
         appState.isProcessing = false;
@@ -309,7 +309,7 @@ async function checkServerHealth() {
         if (response.ok) {
             const data = await response.json();
             appState.serverOnline = true;
-            console.log('✅ Servidor online:', data);
+            console.log(' Servidor online:', data);
             updateUI(); // Atualizar UI quando servidor estiver online
             updateServerStatusDisplay(true); // Atualizar aba de configurações
             return true;
@@ -318,7 +318,7 @@ async function checkServerHealth() {
         }
     } catch (error) {
         appState.serverOnline = false;
-        console.warn('⚠️ Servidor offline:', error.message);
+        console.warn(' Servidor offline:', error.message);
         updateUI(); // Atualizar UI quando servidor estiver offline
         updateServerStatusDisplay(false); // Atualizar aba de configurações
         return false;
@@ -340,7 +340,7 @@ function updateUI() {
     if (isProcessing) {
         elements.transformBtn.innerHTML = '<span class="loading"></span> Transformando...';
     } else {
-        elements.transformBtn.innerHTML = '🔄 Transformar Balancete';
+        elements.transformBtn.innerHTML = ' Transformar Balancete';
     }
     
     // Botão sempre com aparência ativa quando não está processando
@@ -392,7 +392,7 @@ function showResult(data) {
     
     if (data.result && data.result.processed_files) {
         resultHTML += '<div class="result-summary">';
-        resultHTML += `<h3>📊 Resumo do Processamento</h3>`;
+        resultHTML += `<h3> Resumo do Processamento</h3>`;
         resultHTML += `<p><strong>Total processado:</strong> ${data.result.processed_count} arquivo(s)</p>`;
         resultHTML += `<p><strong>Data/Hora:</strong> ${formatDate(data.timestamp)}</p>`;
         if (appState.lastOutputFolder) {
@@ -401,13 +401,13 @@ function showResult(data) {
         resultHTML += '</div>';
         
         resultHTML += '<div class="result-logs">';
-        resultHTML += '<h3>📋 Log de Arquivos</h3>';
+        resultHTML += '<h3> Log de Arquivos</h3>';
         
         // Processar arquivos com sucesso
         data.result.processed_files.forEach(file => {
             const fileName = file.inputFile.split('\\').pop().split('/').pop(); // Pegar apenas o nome do arquivo
             resultHTML += `<div class="log-entry success">`;
-            resultHTML += `<span class="log-icon">✅</span>`;
+            resultHTML += `<span class="log-icon"></span>`;
             resultHTML += `<span class="log-file">${fileName}</span>`;
             resultHTML += `<span class="log-status">SUCESSO</span>`;
             resultHTML += `</div>`;
@@ -417,7 +417,7 @@ function showResult(data) {
         if (data.result.errors && data.result.errors.length > 0) {
             data.result.errors.forEach(error => {
                 resultHTML += `<div class="log-entry error">`;
-                resultHTML += `<span class="log-icon">❌</span>`;
+                resultHTML += `<span class="log-icon"></span>`;
                 resultHTML += `<span class="log-file">${extractFileNameFromError(error)}</span>`;
                 resultHTML += `<span class="log-status">FALHA</span>`;
                 resultHTML += `<div class="log-error-detail">Erro: ${error}</div>`;
@@ -457,12 +457,12 @@ function clearForm() {
     
     updateUI();
     
-    console.log('🗑️ Formulário limpo');
+    console.log(' Formulário limpo');
 }
 
 async function openOutputFolder() {
     try {
-        console.log('📁 Abrindo pasta de saída:', appState.lastOutputFolder);
+        console.log(' Abrindo pasta de saída:', appState.lastOutputFolder);
         
         if (!appState.lastOutputFolder) {
             showStatus('Nenhuma pasta de saída disponível', 'error');
@@ -472,7 +472,7 @@ async function openOutputFolder() {
         // Usar API do Electron para abrir pasta
         if (window.electronAPI && window.electronAPI.openFolder) {
             await window.electronAPI.openFolder(appState.lastOutputFolder);
-            console.log('✅ Pasta aberta com sucesso');
+            console.log(' Pasta aberta com sucesso');
         } else {
             // Fallback: tentar abrir com shell do sistema
             const { shell } = require('electron');
@@ -480,7 +480,7 @@ async function openOutputFolder() {
         }
         
     } catch (error) {
-        console.error('❌ Erro ao abrir pasta:', error);
+        console.error(' Erro ao abrir pasta:', error);
         showStatus('Erro ao abrir pasta: ' + error.message, 'error');
     }
 }
@@ -502,12 +502,12 @@ function formatDate(dateString) {
 
 // Tratamento de erros globais
 window.addEventListener('error', function(event) {
-    console.error('❌ Erro global:', event.error);
+    console.error(' Erro global:', event.error);
     showStatus('Ocorreu um erro inesperado', 'error');
 });
 
 window.addEventListener('unhandledrejection', function(event) {
-    console.error('❌ Promise rejeitada:', event.reason);
+    console.error(' Promise rejeitada:', event.reason);
     showStatus('Erro de comunicação', 'error');
 });
 
@@ -534,7 +534,7 @@ function applyTheme(theme) {
 function updateThemeIcon() {
     const themeIcon = elements.themeToggleBtn.querySelector('.theme-icon');
     if (themeIcon) {
-        themeIcon.textContent = appState.currentTheme === 'light' ? '🌙' : '☀️';
+        themeIcon.textContent = appState.currentTheme === 'light' ? '' : '';
     }
 }
 
@@ -578,7 +578,7 @@ function setupTabs() {
 }
 
 function switchTab(tabId) {
-    console.log(`🔄 Mudando para aba: ${tabId}`);
+    console.log(` Mudando para aba: ${tabId}`);
     
     // Remover classe active de todas as abas
     document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
@@ -588,7 +588,7 @@ function switchTab(tabId) {
     const activeButton = document.querySelector(`[data-tab="${tabId}"]`);
     const activeContent = document.getElementById(`tab-${tabId}`);
     
-    console.log(`🔍 Elementos encontrados:`, {
+    console.log(` Elementos encontrados:`, {
         activeButton: activeButton ? 'encontrado' : 'não encontrado',
         activeContent: activeContent ? 'encontrado' : 'não encontrado'
     });
@@ -596,17 +596,17 @@ function switchTab(tabId) {
     if (activeButton && activeContent) {
         activeButton.classList.add('active');
         activeContent.classList.add('active');
-        console.log(`✅ Aba ativada: ${tabId}`);
+        console.log(` Aba ativada: ${tabId}`);
         
         // Se for a aba de configurações, atualizar informações
         if (tabId === 'configuracoes') {
-            console.log('⚙️ Atualizando informações da aba de configurações...');
+            console.log(' Atualizando informações da aba de configurações...');
             loadAppInfo();
         }
     } else {
-        console.error(`❌ Erro ao ativar aba: ${tabId}`);
-        if (!activeButton) console.error(`❌ Botão não encontrado para: ${tabId}`);
-        if (!activeContent) console.error(`❌ Conteúdo não encontrado para: tab-${tabId}`);
+        console.error(` Erro ao ativar aba: ${tabId}`);
+        if (!activeButton) console.error(` Botão não encontrado para: ${tabId}`);
+        if (!activeContent) console.error(` Conteúdo não encontrado para: tab-${tabId}`);
     }
 }
 
@@ -628,7 +628,7 @@ function addNewTab() {
                     <h2>📄 ${tabName}</h2>
                     <p>Nova aba personalizada</p>
                     <div class="action-buttons">
-                        <button type="button" class="btn btn-primary">🚀 Executar</button>
+                        <button type="button" class="btn btn-primary"> Executar</button>
                     </div>
                 </div>
             </div>
@@ -717,7 +717,7 @@ let versionNotificationState = {
 
 // Inicializar sistema de atualizações
 function initializeUpdateSystem() {
-    console.log('🔄 Inicializando sistema de atualizações...');
+    console.log(' Inicializando sistema de atualizações...');
     
     // Carregar informações da aplicação
     loadAppInfo();
@@ -738,13 +738,11 @@ function initializeUpdateSystem() {
 
 // Inicializar notificação de versão
 function initializeVersionNotification() {
-    console.log('🔔 Inicializando notificação de versão...');
-    
     // Configurar event listeners da notificação
     setupVersionNotificationListeners();
     
     // Mostrar status inicial com ícone de setas girando
-    updateVersionNotification('updated', updateState.currentVersion || '1.0.8');
+    updateVersionNotification('updated', updateState.currentVersion || '0.0.0');
 }
 
 // Configurar event listeners da notificação
@@ -761,8 +759,8 @@ function setupVersionNotificationListeners() {
     if (versionElements.checkBtn) {
         versionElements.checkBtn.addEventListener('click', (e) => {
             e.stopPropagation();
-            console.log('🔄 Botão de verificação clicado');
-            addUpdateLogEntry('🔄 Botão de verificação clicado pelo usuário', 'info');
+            console.log(' Botão de verificação clicado');
+            addUpdateLogEntry(' Botão de verificação clicado pelo usuário', 'info');
             checkForUpdates();
         });
     }
@@ -781,26 +779,26 @@ function handleNotificationClick() {
     switch (versionNotificationState.currentStatus) {
         case 'updated':
             // Se está atualizado, verificar novamente
-            console.log('🔄 Verificando atualizações via clique na notificação...');
-            addUpdateLogEntry('🔄 Verificação iniciada via clique na notificação', 'info');
+            console.log(' Verificando atualizações via clique na notificação...');
+            addUpdateLogEntry(' Verificação iniciada via clique na notificação', 'info');
             checkForUpdates();
             break;
         case 'available':
             // Se há atualização disponível, baixar
-            console.log('📥 Baixando atualização via clique na notificação...');
-            addUpdateLogEntry('📥 Download iniciado via clique na notificação', 'info');
+            console.log(' Baixando atualização via clique na notificação...');
+            addUpdateLogEntry(' Download iniciado via clique na notificação', 'info');
             downloadUpdate();
             break;
         case 'ready':
             // Se está pronta, instalar
-            console.log('🚀 Instalando atualização via clique na notificação...');
-            addUpdateLogEntry('🚀 Instalação iniciada via clique na notificação', 'info');
+            console.log(' Instalando atualização via clique na notificação...');
+            addUpdateLogEntry(' Instalação iniciada via clique na notificação', 'info');
             installUpdate();
             break;
         default:
             // Para outros estados, verificar atualizações
-            console.log('🔄 Verificando atualizações via clique na notificação...');
-            addUpdateLogEntry('🔄 Verificação iniciada via clique na notificação', 'info');
+            console.log(' Verificando atualizações via clique na notificação...');
+            addUpdateLogEntry(' Verificação iniciada via clique na notificação', 'info');
             checkForUpdates();
             break;
     }
@@ -817,11 +815,11 @@ function updateVersionNotification(status, version = null) {
     
     switch (status) {
         case 'updated':
-            versionElements.icon.textContent = '✅';
+            versionElements.icon.textContent = '';
             versionElements.text.textContent = `Atualizado v${version}`;
             versionElements.actionBtn.style.display = 'none';
             versionElements.checkBtn.style.display = 'flex';
-            versionElements.checkBtn.textContent = '🔄';
+            versionElements.checkBtn.textContent = '';
             versionElements.checkBtn.title = 'Verificar atualizações';
             versionElements.notification.classList.add('updated');
             // Tornar clicável
@@ -829,11 +827,11 @@ function updateVersionNotification(status, version = null) {
             break;
             
         case 'available':
-            versionElements.icon.textContent = '📥';
+            versionElements.icon.textContent = '';
             versionElements.text.textContent = 'Atualização disponível';
             versionElements.actionBtn.style.display = 'flex';
             versionElements.checkBtn.style.display = 'none';
-            versionElements.actionBtn.textContent = '📥';
+            versionElements.actionBtn.textContent = '';
             versionElements.actionBtn.title = 'Baixar atualização';
             versionElements.notification.classList.add('update-available');
             versionElements.notification.style.cursor = 'pointer';
@@ -849,11 +847,11 @@ function updateVersionNotification(status, version = null) {
             break;
             
         case 'ready':
-            versionElements.icon.textContent = '🚀';
+            versionElements.icon.textContent = '';
             versionElements.text.textContent = 'Atualização pronta!';
             versionElements.actionBtn.style.display = 'flex';
             versionElements.checkBtn.style.display = 'none';
-            versionElements.actionBtn.textContent = '🔄';
+            versionElements.actionBtn.textContent = '';
             versionElements.actionBtn.title = 'Instalar e reiniciar';
             versionElements.notification.classList.add('update-ready');
             versionElements.notification.style.cursor = 'pointer';
@@ -896,12 +894,12 @@ function handleVersionActionClick() {
     switch (versionNotificationState.currentStatus) {
         case 'available':
             // Baixar atualização
-            addUpdateLogEntry('📥 Iniciando download manual da atualização...', 'info');
+            addUpdateLogEntry(' Iniciando download manual da atualização...', 'info');
             downloadUpdate();
             break;
         case 'ready':
             // Instalar atualização
-            addUpdateLogEntry('🚀 Iniciando instalação da atualização...', 'info');
+            addUpdateLogEntry(' Iniciando instalação da atualização...', 'info');
             installUpdate();
             break;
     }
@@ -921,10 +919,10 @@ async function loadAppInfo() {
             // Atualizar notificação de versão com a versão atual
             updateVersionNotification('updated', info.currentVersion);
             
-            console.log('📋 Informações da aplicação carregadas:', info);
+            console.log(' Informações da aplicação carregadas:', info);
         }
     } catch (error) {
-        console.error('❌ Erro ao carregar informações da aplicação:', error);
+        console.error(' Erro ao carregar informações da aplicação:', error);
     }
 }
 
@@ -933,7 +931,7 @@ function setupUpdateEventListeners() {
     // Botão principal de verificar atualizações
     if (updateElements.mainCheckUpdatesBtn) {
         updateElements.mainCheckUpdatesBtn.addEventListener('click', () => {
-            console.log('🔍 Botão principal de verificação clicado');
+            console.log(' Botão principal de verificação clicado');
             checkForUpdates();
         });
     }
@@ -970,7 +968,7 @@ function setupUpdateEventListeners() {
         
         // Atualização disponível
         window.electronAPI.onUpdateAvailable((event, info) => {
-            console.log('📦 Atualização disponível:', info);
+            console.log(' Atualização disponível:', info);
             updateState.updateAvailable = true;
             updateState.latestVersion = info.version;
             updateState.isChecking = false;
@@ -980,13 +978,13 @@ function setupUpdateEventListeners() {
             // Restaurar botão principal
             if (updateElements.mainCheckUpdatesBtn) {
                 updateElements.mainCheckUpdatesBtn.disabled = false;
-                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+                updateElements.mainCheckUpdatesBtn.innerHTML = ' Verificar Atualizações Agora';
             }
             
             // Restaurar botão de verificação na notificação
             if (versionElements.checkBtn) {
                 versionElements.checkBtn.disabled = false;
-                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.textContent = '';
                 versionElements.checkBtn.title = 'Verificar atualizações';
             }
             
@@ -996,7 +994,7 @@ function setupUpdateEventListeners() {
         
         // Nenhuma atualização disponível
         window.electronAPI.onUpdateNotAvailable((event, info) => {
-            console.log('✅ Aplicação está atualizada:', info);
+            console.log(' Aplicação está atualizada:', info);
             updateState.updateAvailable = false;
             updateState.isChecking = false;
             updateStatus('Aplicação está atualizada', 'success');
@@ -1005,13 +1003,13 @@ function setupUpdateEventListeners() {
             // Restaurar botão principal
             if (updateElements.mainCheckUpdatesBtn) {
                 updateElements.mainCheckUpdatesBtn.disabled = false;
-                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+                updateElements.mainCheckUpdatesBtn.innerHTML = ' Verificar Atualizações Agora';
             }
             
             // Restaurar botão de verificação na notificação
             if (versionElements.checkBtn) {
                 versionElements.checkBtn.disabled = false;
-                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.textContent = '';
                 versionElements.checkBtn.title = 'Verificar atualizações';
             }
             
@@ -1021,20 +1019,20 @@ function setupUpdateEventListeners() {
         
         // Erro na verificação
         window.electronAPI.onUpdateError((event, error) => {
-            console.error('❌ Erro ao verificar atualizações:', error);
+            console.error(' Erro ao verificar atualizações:', error);
             updateStatus(`Erro: ${error}`, 'error');
             updateState.isChecking = false;
             
             // Restaurar botão principal
             if (updateElements.mainCheckUpdatesBtn) {
                 updateElements.mainCheckUpdatesBtn.disabled = false;
-                updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+                updateElements.mainCheckUpdatesBtn.innerHTML = ' Verificar Atualizações Agora';
             }
             
             // Restaurar botão de verificação na notificação
             if (versionElements.checkBtn) {
                 versionElements.checkBtn.disabled = false;
-                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.textContent = '';
                 versionElements.checkBtn.title = 'Verificar atualizações';
             }
             
@@ -1043,7 +1041,7 @@ function setupUpdateEventListeners() {
         
         // Progresso do download
         window.electronAPI.onUpdateDownloadProgress((event, progress) => {
-            console.log('📥 Progresso do download:', progress);
+            console.log(' Progresso do download:', progress);
             updateDownloadProgress(progress);
             
             // Atualizar notificação de versão
@@ -1052,7 +1050,7 @@ function setupUpdateEventListeners() {
         
         // Download concluído
         window.electronAPI.onUpdateDownloaded((event, info) => {
-            console.log('✅ Atualização baixada:', info);
+            console.log(' Atualização baixada:', info);
             updateState.updateDownloaded = true;
             updateState.isDownloading = false;
             updateStatus('Atualização baixada com sucesso!', 'success');
@@ -1068,13 +1066,13 @@ function setupUpdateEventListeners() {
 // Verificar atualizações
 async function checkForUpdates() {
     if (updateState.isChecking || updateState.isDownloading) {
-        addUpdateLogEntry('⚠️ Verificação já em andamento, ignorando nova solicitação', 'warning');
+        addUpdateLogEntry(' Verificação já em andamento, ignorando nova solicitação', 'warning');
         return;
     }
     
     try {
-        console.log('🔍 Verificando atualizações...');
-        addUpdateLogEntry('🔍 Iniciando verificação de atualizações...', 'info');
+        console.log(' Verificando atualizações...');
+        addUpdateLogEntry(' Iniciando verificação de atualizações...', 'info');
         
         updateState.isChecking = true;
         updateStatus('Verificando atualizações...', 'info');
@@ -1100,45 +1098,45 @@ async function checkForUpdates() {
         if (window.electronAPI && window.electronAPI.checkForUpdates) {
             addUpdateLogEntry('📡 Chamando API do Electron para verificar atualizações...', 'info');
             const result = await window.electronAPI.checkForUpdates();
-            console.log('📋 Resultado da verificação:', result);
-            addUpdateLogEntry(`📋 Resultado da API: ${JSON.stringify(result)}`, 'info');
+            console.log(' Resultado da verificação:', result);
+            addUpdateLogEntry(` Resultado da API: ${JSON.stringify(result)}`, 'info');
             
             // Processar resultado da verificação
             if (result.success && result.result.updateAvailable) {
                 addUpdateLogEntry(`🎉 Atualização disponível: v${result.result.latestVersion}`, 'success');
-                addUpdateLogEntry(`📥 Download disponível em: ${result.result.releaseInfo.html_url}`, 'info');
+                addUpdateLogEntry(` Download disponível em: ${result.result.releaseInfo.html_url}`, 'info');
                 
                 // Atualizar notificação de versão
                 updateVersionNotification('available', result.result.latestVersion);
                 
                 // Se o download foi iniciado automaticamente
                 if (result.result.downloadStarted) {
-                    addUpdateLogEntry('📥 Download automático iniciado...', 'info');
+                    addUpdateLogEntry(' Download automático iniciado...', 'info');
                     updateVersionNotification('downloading', result.result.latestVersion);
                 }
             } else if (result.success) {
-                addUpdateLogEntry(`✅ Aplicação está atualizada (v${result.result.currentVersion})`, 'success');
+                addUpdateLogEntry(` Aplicação está atualizada (v${result.result.currentVersion})`, 'success');
                 updateVersionNotification('updated', result.result.currentVersion);
             }
         } else {
-            addUpdateLogEntry('❌ API do Electron não disponível', 'error');
+            addUpdateLogEntry(' API do Electron não disponível', 'error');
         }
     } catch (error) {
-        console.error('❌ Erro ao verificar atualizações:', error);
-        addUpdateLogEntry(`❌ Erro na verificação: ${error.message}`, 'error');
+        console.error(' Erro ao verificar atualizações:', error);
+        addUpdateLogEntry(` Erro na verificação: ${error.message}`, 'error');
         updateStatus(`Erro: ${error.message}`, 'error');
         updateState.isChecking = false;
         
         // Restaurar botão principal
         if (updateElements.mainCheckUpdatesBtn) {
             updateElements.mainCheckUpdatesBtn.disabled = false;
-            updateElements.mainCheckUpdatesBtn.innerHTML = '🔍 Verificar Atualizações Agora';
+            updateElements.mainCheckUpdatesBtn.innerHTML = ' Verificar Atualizações Agora';
         }
         
         // Restaurar botão de verificação na notificação
         if (versionElements.checkBtn) {
             versionElements.checkBtn.disabled = false;
-            versionElements.checkBtn.textContent = '🔄';
+            versionElements.checkBtn.textContent = '';
             versionElements.checkBtn.title = 'Verificar atualizações';
         }
         
@@ -1149,13 +1147,13 @@ async function checkForUpdates() {
 // Baixar atualização
 async function downloadUpdate() {
     if (updateState.isDownloading || !updateState.updateAvailable) {
-        addUpdateLogEntry('⚠️ Download já em andamento ou atualização não disponível', 'warning');
+        addUpdateLogEntry(' Download já em andamento ou atualização não disponível', 'warning');
         return;
     }
     
     try {
-        console.log('📥 Baixando atualização...');
-        addUpdateLogEntry('📥 Iniciando download da atualização...', 'info');
+        console.log(' Baixando atualização...');
+        addUpdateLogEntry(' Iniciando download da atualização...', 'info');
         updateState.isDownloading = true;
         updateStatus('Baixando atualização...', 'info');
         showProgressBar();
@@ -1163,28 +1161,28 @@ async function downloadUpdate() {
         
         if (window.electronAPI && window.electronAPI.downloadUpdate) {
             const result = await window.electronAPI.downloadUpdate();
-            console.log('📋 Resultado do download:', result);
+            console.log(' Resultado do download:', result);
             
             if (result.success) {
-                addUpdateLogEntry('✅ Download concluído com sucesso!', 'success');
+                addUpdateLogEntry(' Download concluído com sucesso!', 'success');
                 updateState.isDownloading = false;
                 updateState.updateReady = true;
                 updateStatus('Atualização pronta para instalação!', 'success');
                 hideProgressBar();
                 updateUI();
             } else {
-                addUpdateLogEntry(`❌ Erro no download: ${result.error}`, 'error');
+                addUpdateLogEntry(` Erro no download: ${result.error}`, 'error');
                 updateState.isDownloading = false;
                 updateStatus(`Erro: ${result.error}`, 'error');
                 hideProgressBar();
                 updateUI();
             }
         } else {
-            addUpdateLogEntry('❌ API de download não disponível', 'error');
+            addUpdateLogEntry(' API de download não disponível', 'error');
         }
     } catch (error) {
-        console.error('❌ Erro ao baixar atualização:', error);
-        addUpdateLogEntry(`❌ Erro no download: ${error.message}`, 'error');
+        console.error(' Erro ao baixar atualização:', error);
+        addUpdateLogEntry(` Erro no download: ${error.message}`, 'error');
         updateStatus(`Erro: ${error.message}`, 'error');
         updateState.isDownloading = false;
         updateUI();
@@ -1194,31 +1192,31 @@ async function downloadUpdate() {
 // Instalar atualização
 async function installUpdate() {
     if (!updateState.updateReady) {
-        addUpdateLogEntry('⚠️ Atualização não está pronta para instalação', 'warning');
+        addUpdateLogEntry(' Atualização não está pronta para instalação', 'warning');
         return;
     }
     
     try {
-        console.log('🔄 Instalando atualização...');
-        addUpdateLogEntry('🚀 Iniciando instalação da atualização...', 'info');
+        console.log(' Instalando atualização...');
+        addUpdateLogEntry(' Iniciando instalação da atualização...', 'info');
         updateStatus('Instalando atualização e reiniciando...', 'info');
         
         if (window.electronAPI && window.electronAPI.installUpdate) {
             const result = await window.electronAPI.installUpdate();
-            console.log('📋 Resultado da instalação:', result);
+            console.log(' Resultado da instalação:', result);
             
             if (result.success) {
-                addUpdateLogEntry('✅ Instalação iniciada! Aplicação será fechada...', 'success');
-                addUpdateLogEntry('🔄 Reinicie a aplicação após a instalação', 'info');
+                addUpdateLogEntry(' Instalação iniciada! Aplicação será fechada...', 'success');
+                addUpdateLogEntry(' Reinicie a aplicação após a instalação', 'info');
             } else {
-                addUpdateLogEntry(`❌ Erro na instalação: ${result.error}`, 'error');
+                addUpdateLogEntry(` Erro na instalação: ${result.error}`, 'error');
             }
         } else {
-            addUpdateLogEntry('❌ API de instalação não disponível', 'error');
+            addUpdateLogEntry(' API de instalação não disponível', 'error');
         }
     } catch (error) {
-        console.error('❌ Erro ao instalar atualização:', error);
-        addUpdateLogEntry(`❌ Erro na instalação: ${error.message}`, 'error');
+        console.error(' Erro ao instalar atualização:', error);
+        addUpdateLogEntry(` Erro na instalação: ${error.message}`, 'error');
         updateStatus(`Erro: ${error.message}`, 'error');
     }
 }
@@ -1234,7 +1232,7 @@ function updateStatus(message, type = 'info') {
         updateElements.updateMessage.className = `update-message ${type}`;
     }
     
-    console.log(`📊 Status: ${message}`);
+    console.log(` Status: ${message}`);
 }
 
 // Atualizar progresso do download
@@ -1363,7 +1361,7 @@ let updateLogState = {
 
 // Inicializar sistema de log
 function initializeUpdateLog() {
-    console.log('📝 Inicializando sistema de log de atualizações...');
+    console.log(' Inicializando sistema de log de atualizações...');
     
     // Configurar event listeners
     if (updateLogElements.clearBtn) {
@@ -1380,7 +1378,7 @@ function initializeUpdateLog() {
     // Configurar interceptadores de eventos
     setupUpdateEventInterceptors();
     
-    console.log('✅ Sistema de log de atualizações configurado');
+    console.log(' Sistema de log de atualizações configurado');
 }
 
 // Adicionar entrada no log
@@ -1402,7 +1400,7 @@ function addUpdateLogEntry(message, type = 'info') {
     // Atualizar interface
     updateUpdateLogDisplay();
     
-    console.log(`📝 [${timestamp}] ${message}`);
+    console.log(` [${timestamp}] ${message}`);
 }
 
 // Atualizar exibição do log
@@ -1437,37 +1435,37 @@ async function testUpdateSystem() {
     try {
         // Verificar se a API está disponível
         if (!window.electronAPI) {
-            addUpdateLogEntry('❌ API do Electron não está disponível', 'error');
+            addUpdateLogEntry(' API do Electron não está disponível', 'error');
             return;
         }
         
         if (!window.electronAPI.checkForUpdates) {
-            addUpdateLogEntry('❌ Função checkForUpdates não está disponível', 'error');
+            addUpdateLogEntry(' Função checkForUpdates não está disponível', 'error');
             return;
         }
         
-        addUpdateLogEntry('🔍 Chamando checkForUpdates...', 'info');
+        addUpdateLogEntry(' Chamando checkForUpdates...', 'info');
         
         const result = await window.electronAPI.checkForUpdates();
         
         if (result.success) {
-            addUpdateLogEntry('✅ Verificação de atualizações executada com sucesso', 'success');
-            addUpdateLogEntry(`📋 Resultado: ${JSON.stringify(result.result)}`, 'info');
+            addUpdateLogEntry(' Verificação de atualizações executada com sucesso', 'success');
+            addUpdateLogEntry(` Resultado: ${JSON.stringify(result.result)}`, 'info');
             
             // Processar resultado da verificação
             if (result.result.updateAvailable) {
                 addUpdateLogEntry(`🎉 Atualização disponível: v${result.result.latestVersion}`, 'success');
-                addUpdateLogEntry(`📥 Download disponível em: ${result.result.releaseInfo.html_url}`, 'info');
+                addUpdateLogEntry(` Download disponível em: ${result.result.releaseInfo.html_url}`, 'info');
             } else {
-                addUpdateLogEntry(`✅ Aplicação está atualizada (v${result.result.currentVersion})`, 'success');
+                addUpdateLogEntry(` Aplicação está atualizada (v${result.result.currentVersion})`, 'success');
             }
         } else {
-            addUpdateLogEntry(`❌ Erro na verificação: ${result.error}`, 'error');
+            addUpdateLogEntry(` Erro na verificação: ${result.error}`, 'error');
         }
         
     } catch (error) {
-        addUpdateLogEntry(`❌ Erro inesperado: ${error.message}`, 'error');
-        console.error('❌ Erro no teste de atualizações:', error);
+        addUpdateLogEntry(` Erro inesperado: ${error.message}`, 'error');
+        console.error(' Erro no teste de atualizações:', error);
     }
 }
 
@@ -1476,40 +1474,40 @@ function setupUpdateEventInterceptors() {
     if (window.electronAPI) {
         // Verificando atualizações
         window.electronAPI.onUpdateChecking(() => {
-            addUpdateLogEntry('🔍 Verificando atualizações...', 'info');
+            addUpdateLogEntry(' Verificando atualizações...', 'info');
             addUpdateLogEntry('📡 Conectando com GitHub API...', 'info');
         });
         
         // Atualização disponível
         window.electronAPI.onUpdateAvailable((event, info) => {
-            addUpdateLogEntry(`📦 Atualização disponível: v${info.version}`, 'success');
-            addUpdateLogEntry(`📋 Detalhes: ${JSON.stringify(info)}`, 'info');
+            addUpdateLogEntry(` Atualização disponível: v${info.version}`, 'success');
+            addUpdateLogEntry(` Detalhes: ${JSON.stringify(info)}`, 'info');
         });
         
         // Nenhuma atualização disponível
         window.electronAPI.onUpdateNotAvailable((event, info) => {
-            addUpdateLogEntry(`✅ Aplicação está atualizada: v${info.version}`, 'success');
+            addUpdateLogEntry(` Aplicação está atualizada: v${info.version}`, 'success');
         });
         
         // Erro na verificação
         window.electronAPI.onUpdateError((event, error) => {
-            addUpdateLogEntry(`❌ Erro ao verificar atualizações: ${error}`, 'error');
+            addUpdateLogEntry(` Erro ao verificar atualizações: ${error}`, 'error');
             
             // Analisar o tipo de erro
             if (error.includes('406')) {
-                addUpdateLogEntry('🔍 Erro 406: Problema com headers da requisição', 'warning');
+                addUpdateLogEntry(' Erro 406: Problema com headers da requisição', 'warning');
                 addUpdateLogEntry('💡 Solução: Verificar configuração do GitHub Provider', 'info');
             } else if (error.includes('404')) {
-                addUpdateLogEntry('🔍 Erro 404: Repositório não encontrado', 'warning');
+                addUpdateLogEntry(' Erro 404: Repositório não encontrado', 'warning');
                 addUpdateLogEntry('💡 Solução: Verificar se o repositório existe e é público', 'info');
             } else if (error.includes('Unable to find latest version')) {
-                addUpdateLogEntry('🔍 Erro: Não consegue encontrar versão mais recente', 'warning');
+                addUpdateLogEntry(' Erro: Não consegue encontrar versão mais recente', 'warning');
                 addUpdateLogEntry('💡 Solução: Verificar se há releases no GitHub', 'info');
             } else if (error.includes('HttpError')) {
-                addUpdateLogEntry('🔍 Erro HTTP: Problema de conectividade', 'warning');
+                addUpdateLogEntry(' Erro HTTP: Problema de conectividade', 'warning');
                 addUpdateLogEntry('💡 Solução: Verificar conexão com internet', 'info');
             } else if (error.includes('Repositório não encontrado')) {
-                addUpdateLogEntry('🔍 Erro: Repositório não acessível', 'warning');
+                addUpdateLogEntry(' Erro: Repositório não acessível', 'warning');
                 addUpdateLogEntry('💡 Solução: Verificar se o repositório AlexandreSilvestrin/XY-task existe', 'info');
             }
         });
@@ -1517,21 +1515,21 @@ function setupUpdateEventInterceptors() {
         // Progresso do download
         window.electronAPI.onUpdateDownloadProgress((event, progress) => {
             const percent = Math.round(progress.percent);
-            addUpdateLogEntry(`📥 Download: ${percent}% (${progress.bytesPerSecond} bytes/s)`, 'info');
+            addUpdateLogEntry(` Download: ${percent}% (${progress.bytesPerSecond} bytes/s)`, 'info');
         });
         
         // Download concluído
         window.electronAPI.onUpdateDownloaded((event, info) => {
-            addUpdateLogEntry(`✅ Atualização baixada: v${info.version}`, 'success');
+            addUpdateLogEntry(` Atualização baixada: v${info.version}`, 'success');
         });
     } else {
-        addUpdateLogEntry('❌ API do Electron não está disponível', 'error');
+        addUpdateLogEntry(' API do Electron não está disponível', 'error');
     }
 }
 
 // Inicializar aba de configurações
 function initializeConfigTab() {
-    console.log('⚙️ Inicializando aba de configurações...');
+    console.log(' Inicializando aba de configurações...');
     
     // Carregar informações da aplicação
     loadAppInfo();
@@ -1563,7 +1561,7 @@ async function loadAppInfo() {
             updateServerStatusDisplay(appInfo.pythonRunning);
         }
     } catch (error) {
-        console.error('❌ Erro ao carregar informações da aplicação:', error);
+        console.error(' Erro ao carregar informações da aplicação:', error);
     }
 }
 
@@ -1579,13 +1577,13 @@ function updateServerStatusDisplay(isRunning) {
 // Configurar event listeners da aba de configurações
 function setupConfigTabListeners() {
     // Apenas os controles do log de atualizações permanecem
-    console.log('⚙️ Event listeners da aba de configurações configurados');
+    console.log(' Event listeners da aba de configurações configurados');
 }
 
 // Carregar configurações salvas
 function loadConfigSettings() {
     // Configurações simplificadas - apenas log de atualizações
-    console.log('⚙️ Configurações carregadas');
+    console.log(' Configurações carregadas');
 }
 
 // Funções de configuração simplificadas removidas
@@ -1611,21 +1609,21 @@ async function startPythonServerAutomatically() {
         // Verificar se já está rodando
         const isRunning = await checkPythonStatus();
         if (isRunning) {
-            console.log('✅ Servidor Python já está rodando');
+            console.log(' Servidor Python já está rodando');
             return true;
         }
         
         // Tentar iniciar o servidor
         const result = await startPythonServer();
         if (result) {
-            console.log('✅ Servidor Python iniciado automaticamente');
+            console.log(' Servidor Python iniciado automaticamente');
             return true;
         } else {
-            console.warn('⚠️ Falha ao iniciar servidor Python automaticamente');
+            console.warn(' Falha ao iniciar servidor Python automaticamente');
             return false;
         }
     } catch (error) {
-        console.error('❌ Erro ao iniciar servidor Python automaticamente:', error);
+        console.error(' Erro ao iniciar servidor Python automaticamente:', error);
         return false;
     }
 }
@@ -1650,7 +1648,7 @@ async function checkPythonStatus() {
             return status.isRunning;
         }
     } catch (error) {
-        console.error('❌ Erro ao verificar status do Python:', error);
+        console.error(' Erro ao verificar status do Python:', error);
         appState.serverOnline = false;
         updateUI();
         updateServerStatusDisplay(false);
@@ -1668,7 +1666,7 @@ async function startPythonServer() {
             const result = await window.electronAPI.startPythonServer();
             
             if (result.success) {
-                console.log('✅ Servidor Python iniciado com sucesso');
+                console.log(' Servidor Python iniciado com sucesso');
                 showStatus('Servidor Python iniciado!', 'success');
                 appState.serverOnline = true;
                 updatePythonStatusUI(true);
@@ -1676,7 +1674,7 @@ async function startPythonServer() {
                 updateServerStatusDisplay(true); // Atualizar aba de configurações
                 return true;
             } else {
-                console.error('❌ Falha ao iniciar servidor Python');
+                console.error(' Falha ao iniciar servidor Python');
                 showStatus('Falha ao iniciar servidor Python', 'error');
                 appState.serverOnline = false;
                 updateUI();
@@ -1684,7 +1682,7 @@ async function startPythonServer() {
                 return false;
             }
         } else {
-            console.error('❌ API do Python não disponível');
+            console.error(' API do Python não disponível');
             showStatus('API do Python não disponível', 'error');
             appState.serverOnline = false;
             updateUI();
@@ -1692,7 +1690,7 @@ async function startPythonServer() {
             return false;
         }
     } catch (error) {
-        console.error('❌ Erro ao iniciar servidor Python:', error);
+        console.error(' Erro ao iniciar servidor Python:', error);
         showStatus('Erro ao iniciar servidor Python: ' + error.message, 'error');
         appState.serverOnline = false;
         updateUI();
@@ -1704,14 +1702,14 @@ async function startPythonServer() {
 // Parar servidor Python
 async function stopPythonServer() {
     try {
-        console.log('🛑 Parando servidor Python...');
+        console.log(' Parando servidor Python...');
         showStatus('Parando servidor Python...', 'info');
         
         if (window.electronAPI && window.electronAPI.forceStopPython) {
             const result = await window.electronAPI.forceStopPython();
             
             if (result.success) {
-                console.log('✅ Servidor Python parado com sucesso');
+                console.log(' Servidor Python parado com sucesso');
                 showStatus('Servidor Python parado!', 'success');
                 appState.serverOnline = false;
                 updatePythonStatusUI(false);
@@ -1719,17 +1717,17 @@ async function stopPythonServer() {
                 updateServerStatusDisplay(false); // Atualizar aba de configurações
                 return true;
             } else {
-                console.error('❌ Falha ao parar servidor Python');
+                console.error(' Falha ao parar servidor Python');
                 showStatus('Falha ao parar servidor Python', 'error');
                 return false;
             }
         } else {
-            console.error('❌ API do Python não disponível');
+            console.error(' API do Python não disponível');
             showStatus('API do Python não disponível', 'error');
             return false;
         }
     } catch (error) {
-        console.error('❌ Erro ao parar servidor Python:', error);
+        console.error(' Erro ao parar servidor Python:', error);
         showStatus('Erro ao parar servidor Python: ' + error.message, 'error');
         return false;
     }
@@ -1786,4 +1784,4 @@ function updatePythonStatusUI(isRunning) {
     updateUI();
 }
 
-console.log('📱 Frontend carregado com sucesso!');
+console.log(' Frontend carregado com sucesso!');

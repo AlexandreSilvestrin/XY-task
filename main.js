@@ -5,16 +5,17 @@ const { spawn } = require('child_process');
 const axios = require('axios');
 const { autoUpdater } = require('electron-updater');
 
+
 // Verificação de instância única
 const gotTheLock = app.requestSingleInstanceLock();
 
 if (!gotTheLock) {
-    console.log('⚠️ Aplicação já está em execução. Fechando nova instância...');
+    console.log('Aplicação já está em execução. Fechando nova instância...');
     app.quit();
 } else {
     // Configurar handler para quando uma segunda instância tentar abrir
     app.on('second-instance', (event, commandLine, workingDirectory) => {
-        console.log('🔄 Segunda instância detectada, focando na janela existente...');
+        console.log('Segunda instância detectada, focando na janela existente...');
         
         // Se a janela principal existe, focar nela
         if (mainWindow) {
@@ -74,7 +75,7 @@ let isPythonRunning = false;
 
 // Função para criar a janela principal
 function createWindow() {
-    console.log('🪟 Criando janela principal...');
+    console.log('Criando janela principal...');
     
     mainWindow = new BrowserWindow({
         width: 1200,
@@ -106,7 +107,7 @@ function createWindow() {
 
 // Função para criar janela de splash pequena
 function createSplashWindow() {
-    console.log('🎨 Criando janela de splash...');
+    console.log('Criando janela de splash...');
     
     splashWindow = new BrowserWindow({
         width: 500,
@@ -141,7 +142,7 @@ function createSplashWindow() {
 
     // Mostrar splash quando estiver pronto
     splashWindow.once('ready-to-show', () => {
-        console.log('✅ Splash screen pronto');
+        console.log('Splash screen pronto');
         splashWindow.show();
         splashWindow.center();
         
@@ -171,16 +172,16 @@ function createSplashWindow() {
 
     // Eventos da janela
     mainWindow.on('closed', () => {
-        console.log('🪟 Janela fechada');
+        console.log('Janela fechada');
         mainWindow = null;
     });
 
     mainWindow.on('minimize', () => {
-        console.log('📦 Janela minimizada');
+        console.log('Janela minimizada');
     });
 
     mainWindow.on('maximize', () => {
-        console.log('📦 Janela maximizada');
+        console.log('Janela maximizada');
     });
 
     // Prevenir navegação para URLs externas
@@ -189,38 +190,38 @@ function createSplashWindow() {
         
         if (parsedUrl.origin !== `file://`) {
             event.preventDefault();
-            console.log('🚫 Navegação bloqueada para:', navigationUrl);
+            console.log('Navegação bloqueada para:', navigationUrl);
         }
     });
 }
 
 // Função para carregar a aplicação principal
 async function loadMainApplication() {
-    console.log('🚀 Carregando aplicação principal...');
+    console.log('Carregando aplicação principal...');
     
     try {
         // Carregar o HTML principal
         await mainWindow.loadFile(path.join(__dirname, 'frontend', 'index.html'));
-        console.log('✅ Aplicação principal carregada');
+        console.log('Aplicação principal carregada');
         
         // Notificar o renderer que a aplicação está pronta
         mainWindow.webContents.send('app-ready');
         
     } catch (error) {
-        console.error('❌ Erro ao carregar aplicação principal:', error);
+        console.error('Erro ao carregar aplicação principal:', error);
     }
 }
 
 // Event listeners do Auto-Updater
 autoUpdater.on('checking-for-update', () => {
-    console.log('🔍 Verificando atualizações...');
+    console.log('Verificando atualizações...');
     if (mainWindow) {
         mainWindow.webContents.send('update-checking');
     }
 });
 
 autoUpdater.on('update-available', (info) => {
-    console.log('📦 Atualização disponível:', info.version);
+    console.log('Atualização disponível:', info.version);
     if (mainWindow) {
         mainWindow.webContents.send('update-available', info);
     }
@@ -243,14 +244,14 @@ autoUpdater.on('update-available', (info) => {
 });
 
 autoUpdater.on('update-not-available', (info) => {
-    console.log('✅ Aplicação está atualizada:', info.version);
+    console.log('Aplicação está atualizada:', info.version);
     if (mainWindow) {
         mainWindow.webContents.send('update-not-available', info);
     }
 });
 
 autoUpdater.on('error', (err) => {
-    console.error('❌ Erro ao verificar atualizações:', err);
+    console.error('Erro ao verificar atualizações:', err);
     if (mainWindow) {
         mainWindow.webContents.send('update-error', err.message);
     }
@@ -260,7 +261,7 @@ autoUpdater.on('download-progress', (progressObj) => {
     let log_message = "Velocidade de download: " + progressObj.bytesPerSecond;
     log_message = log_message + ' - Downloaded ' + progressObj.percent + '%';
     log_message = log_message + ' (' + progressObj.transferred + "/" + progressObj.total + ')';
-    console.log('📥 Progresso do download:', log_message);
+    console.log('Progresso do download:', log_message);
     
     if (mainWindow) {
         mainWindow.webContents.send('update-download-progress', progressObj);
@@ -268,7 +269,7 @@ autoUpdater.on('download-progress', (progressObj) => {
 });
 
 autoUpdater.on('update-downloaded', (info) => {
-    console.log('✅ Atualização baixada:', info.version);
+    console.log('Atualização baixada:', info.version);
     if (mainWindow) {
         mainWindow.webContents.send('update-downloaded', info);
     }
@@ -293,12 +294,12 @@ autoUpdater.on('update-downloaded', (info) => {
 // Função para iniciar o servidor Python
 async function startPythonServer() {
     if (isPythonRunning) {
-        console.log('🐍 Servidor Python já está rodando');
+        console.log('Servidor Python já está rodando');
         return true;
     }
 
-    console.log('🐍 Iniciando servidor Python...');
-    console.log('📁 Script Python:', CONFIG.PYTHON_SCRIPT);
+    console.log('Iniciando servidor Python...');
+    console.log('Script Python:', CONFIG.PYTHON_SCRIPT);
 
     try {
         // Verificar se o arquivo Python existe
@@ -314,16 +315,16 @@ async function startPythonServer() {
             // Em build empacotado, o Python está em resources/backend/python/
             pythonPath = path.join(process.resourcesPath, 'backend', 'python', 'python.exe');
             backendDir = path.join(process.resourcesPath, 'backend');
-            console.log('📦 MODO DE PRODUÇÃO - Aplicação empacotada');
+            console.log('MODO DE PRODUÇÃO - Aplicação empacotada');
         } else {
             // Em desenvolvimento, usar caminho relativo
             pythonPath = path.join(__dirname, 'backend', 'python', 'python.exe');
             backendDir = path.join(__dirname, 'backend');
-            console.log('🔧 MODO DE DESENVOLVIMENTO - Aplicação não empacotada');
+            console.log('MODO DE DESENVOLVIMENTO - Aplicação não empacotada');
         }
         
-        console.log('🐍 Caminho do Python:', pythonPath);
-        console.log('🐍 Diretório do backend:', backendDir);
+        console.log('Caminho do Python:', pythonPath);
+        console.log('Diretório do backend:', backendDir);
         
         // Verificar se o executável Python existe
         if (!fs.existsSync(pythonPath)) {
@@ -335,34 +336,40 @@ async function startPythonServer() {
             throw new Error(`Diretório do backend não encontrado: ${backendDir}`);
         }
         
-        console.log('✅ Todos os arquivos necessários foram encontrados');
+        console.log('Todos os arquivos necessários foram encontrados');
         
         pythonProcess = spawn(pythonPath, [CONFIG.PYTHON_SCRIPT], {
             cwd: backendDir,
             stdio: ['pipe', 'pipe', 'pipe'],
             env: {
                 ...process.env,
-                PYTHONPATH: backendDir
+                PYTHONPATH: backendDir,
+                PYTHONIOENCODING: 'utf-8',
+                PYTHONUTF8: '1'
             }
         });
 
         // Configurar handlers do processo
         pythonProcess.stdout.on('data', (data) => {
-            console.log('🐍 Python stdout:', data.toString().trim());
+            // Garantir decodificação UTF-8
+            const text = Buffer.isBuffer(data) ? data.toString('utf8') : data.toString('utf8');
+            console.log('Python stdout:', text.trim());
         });
 
         pythonProcess.stderr.on('data', (data) => {
-            console.error('🐍 Python stderr:', data.toString().trim());
+            // Garantir decodificação UTF-8
+            const text = Buffer.isBuffer(data) ? data.toString('utf8') : data.toString('utf8');
+            console.error('Python stderr:', text.trim());
         });
 
         pythonProcess.on('close', (code) => {
-            console.log(`🐍 Processo Python finalizado com código: ${code}`);
+            console.log(`Processo Python finalizado com código: ${code}`);
             isPythonRunning = false;
             pythonProcess = null;
         });
 
         pythonProcess.on('error', (error) => {
-            console.error('🐍 Erro no processo Python:', error);
+            console.error('Erro no processo Python:', error);
             isPythonRunning = false;
             pythonProcess = null;
         });
@@ -371,14 +378,14 @@ async function startPythonServer() {
         const isReady = await waitForServer();
         if (isReady) {
             isPythonRunning = true;
-            console.log('✅ Servidor Python iniciado com sucesso!');
+            console.log('Servidor Python iniciado com sucesso!');
             return true;
         } else {
             throw new Error('Servidor Python não respondeu');
         }
 
     } catch (error) {
-        console.error('❌ Erro ao iniciar servidor Python:', error);
+        console.error('Erro ao iniciar servidor Python:', error);
         isPythonRunning = false;
         return false;
     }
@@ -387,23 +394,23 @@ async function startPythonServer() {
 // Função para aguardar o servidor estar pronto
 async function waitForServer(retries = 0) {
     if (retries >= CONFIG.MAX_RETRIES) {
-        console.error('❌ Timeout aguardando servidor Python');
+        console.error('Timeout aguardando servidor Python');
         return false;
     }
 
     try {
-        console.log(`🔄 Verificando servidor Python... (tentativa ${retries + 1}/${CONFIG.MAX_RETRIES})`);
+        console.log(`Verificando servidor Python... (tentativa ${retries + 1}/${CONFIG.MAX_RETRIES})`);
         
         const response = await axios.get(`${CONFIG.API_URL}/health`, {
             timeout: 2000
         });
 
         if (response.status === 200) {
-            console.log('✅ Servidor Python está respondendo!');
+            console.log('Servidor Python está respondendo!');
             return true;
         }
     } catch (error) {
-        console.log('⏳ Servidor ainda não está pronto, aguardando...');
+        console.log('Servidor ainda não está pronto, aguardando...');
         
         // Aguardar antes da próxima tentativa
         await new Promise(resolve => setTimeout(resolve, CONFIG.CHECK_INTERVAL));
@@ -414,17 +421,17 @@ async function waitForServer(retries = 0) {
 // Função para parar o servidor Python
 async function stopPythonServer() {
     if (pythonProcess && isPythonRunning) {
-        console.log('🛑 Parando servidor Python...');
+        console.log('Parando servidor Python...');
         
         try {
             // Primeiro, tentar shutdown via HTTP
-            console.log('🌐 Enviando requisição de shutdown via HTTP...');
+            console.log('Enviando requisição de shutdown via HTTP...');
             await axios.post(`${CONFIG.API_URL}/shutdown`, {}, {
                 timeout: 3000
             });
-            console.log('✅ Requisição de shutdown enviada');
+            console.log('Requisição de shutdown enviada');
         } catch (error) {
-            console.log('⚠️ Shutdown via HTTP falhou, usando sinais do sistema...');
+            console.log('Shutdown via HTTP falhou, usando sinais do sistema...');
         }
         
         // Aguardar um pouco para o shutdown gracioso
@@ -432,7 +439,7 @@ async function stopPythonServer() {
         
         // Verificar se o processo ainda está ativo
         if (pythonProcess && !pythonProcess.killed) {
-            console.log('🔨 Processo ainda ativo, enviando SIGTERM...');
+            console.log('Processo ainda ativo, enviando SIGTERM...');
             pythonProcess.kill('SIGTERM');
             
             // Aguardar mais um pouco
@@ -440,30 +447,30 @@ async function stopPythonServer() {
             
             // Se ainda estiver ativo, forçar com SIGKILL
             if (pythonProcess && !pythonProcess.killed) {
-                console.log('🔨 Forçando parada com SIGKILL...');
+                console.log('Forçando parada com SIGKILL...');
                 pythonProcess.kill('SIGKILL');
                 
                 // Aguardar e verificar novamente
                 setTimeout(() => {
                     if (pythonProcess && !pythonProcess.killed) {
-                        console.error('❌ Não foi possível finalizar o processo Python');
-                        console.log('🔍 PID do processo:', pythonProcess.pid);
+                        console.error('Não foi possível finalizar o processo Python');
+                        console.log('PID do processo:', pythonProcess.pid);
                     } else {
-                        console.log('✅ Processo Python finalizado com sucesso');
+                        console.log('Processo Python finalizado com sucesso');
                     }
                 }, 2000);
             } else {
-                console.log('✅ Processo Python finalizado graciosamente');
+                console.log('Processo Python finalizado graciosamente');
             }
         } else {
-            console.log('✅ Processo Python finalizado via HTTP');
+            console.log('Processo Python finalizado via HTTP');
         }
         
         isPythonRunning = false;
         pythonProcess = null;
     } else if (pythonProcess) {
         // Se o processo existe mas isPythonRunning é false, forçar kill
-        console.log('🔨 Forçando finalização de processo Python órfão...');
+        console.log('Forçando finalização de processo Python órfão...');
         pythonProcess.kill('SIGKILL');
         pythonProcess = null;
     }
@@ -472,7 +479,7 @@ async function stopPythonServer() {
 // Handlers IPC para comunicação com o renderer
 ipcMain.handle('select-file', async () => {
     try {
-        console.log('📂 Abrindo diálogo de seleção de arquivo...');
+        console.log('Abrindo diálogo de seleção de arquivo...');
         
         const result = await dialog.showOpenDialog(mainWindow, {
             title: 'Selecionar Arquivo',
@@ -485,44 +492,44 @@ ipcMain.handle('select-file', async () => {
             ]
         });
 
-        console.log('📂 Resultado da seleção:', result);
+        console.log('Resultado da seleção:', result);
         return result;
     } catch (error) {
-        console.error('❌ Erro ao selecionar arquivo:', error);
+        console.error('Erro ao selecionar arquivo:', error);
         return { canceled: true };
     }
 });
 
 ipcMain.handle('select-folder', async () => {
     try {
-        console.log('📁 Abrindo diálogo de seleção de pasta de entrada...');
+        console.log('Abrindo diálogo de seleção de pasta de entrada...');
         
         const result = await dialog.showOpenDialog(mainWindow, {
             title: 'Selecionar Pasta de Entrada',
             properties: ['openDirectory', 'createDirectory']
         });
 
-        console.log('📁 Resultado da seleção:', result);
+        console.log('Resultado da seleção:', result);
         return result;
     } catch (error) {
-        console.error('❌ Erro ao selecionar pasta:', error);
+        console.error('Erro ao selecionar pasta:', error);
         return { canceled: true };
     }
 });
 
 ipcMain.handle('select-output-folder', async () => {
     try {
-        console.log('📁 Abrindo diálogo de seleção de pasta de saída...');
+        console.log('Abrindo diálogo de seleção de pasta de saída...');
         
         const result = await dialog.showOpenDialog(mainWindow, {
             title: 'Selecionar Pasta de Saída',
             properties: ['openDirectory', 'createDirectory']
         });
 
-        console.log('📁 Resultado da seleção:', result);
+        console.log('Resultado da seleção:', result);
         return result;
     } catch (error) {
-        console.error('❌ Erro ao selecionar pasta de saída:', error);
+        console.error('Erro ao selecionar pasta de saída:', error);
         return { canceled: true };
     }
 });
@@ -540,7 +547,7 @@ ipcMain.handle('get-app-info', () => {
 
 // Handler para iniciar Python sob demanda
 ipcMain.handle('start-python-server', async () => {
-    console.log('🐍 Iniciando servidor Python sob demanda...');
+    console.log('Iniciando servidor Python sob demanda...');
     const success = await startPythonServer();
     return { success, isRunning: isPythonRunning };
 });
@@ -569,37 +576,37 @@ ipcMain.handle('window-maximize', () => {
 
 ipcMain.handle('open-folder', async (event, folderPath) => {
     try {
-        console.log('📁 Abrindo pasta:', folderPath);
+        console.log('Abrindo pasta:', folderPath);
         
         const { shell } = require('electron');
         await shell.openPath(folderPath);
         
-        console.log('✅ Pasta aberta com sucesso');
+        console.log('Pasta aberta com sucesso');
         return { success: true };
     } catch (error) {
-        console.error('❌ Erro ao abrir pasta:', error);
+        console.error('Erro ao abrir pasta:', error);
         return { success: false, error: error.message };
     }
 });
 
 ipcMain.handle('open-external', async (event, url) => {
     try {
-        console.log('🌐 Abrindo URL no navegador padrão:', url);
+        console.log('Abrindo URL no navegador padrão:', url);
         
         const { shell } = require('electron');
         await shell.openExternal(url);
         
-        console.log('✅ URL aberta no navegador padrão');
+        console.log('URL aberta no navegador padrão');
         return { success: true };
     } catch (error) {
-        console.error('❌ Erro ao abrir URL:', error);
+        console.error('Erro ao abrir URL:', error);
         return { success: false, error: error.message };
     }
 });
 
 // Handler para forçar parada do servidor Python
 ipcMain.handle('force-stop-python', async () => {
-    console.log('🛑 Forçando parada do servidor Python via IPC...');
+    console.log('Forçando parada do servidor Python via IPC...');
     await stopPythonServer();
     return { success: true };
 });
@@ -607,24 +614,24 @@ ipcMain.handle('force-stop-python', async () => {
 // Handlers para controle de atualizações
 ipcMain.handle('check-for-updates', async () => {
     try {
-        console.log('🔍 Verificando atualizações manualmente...');
+        console.log('Verificando atualizações manualmente...');
         if (app.isPackaged) {
             // Usar verificação manual via API REST do GitHub
             const result = await checkGitHubReleases();
             
             // Se há atualização disponível, iniciar download automático
             if (result.updateAvailable) {
-                console.log('📥 Iniciando download automático da atualização...');
+                console.log('Iniciando download automático da atualização...');
                 await downloadUpdateFromGitHub(result.releaseInfo);
             }
             
             return { success: true, result };
         } else {
-            console.log('⚠️ Modo desenvolvimento - simulando verificação de atualizações');
+            console.log('Modo desenvolvimento - simulando verificação de atualizações');
             return { success: false, error: 'Aplicação não está empacotada' };
         }
     } catch (error) {
-        console.error('❌ Erro ao verificar atualizações:', error);
+        console.error('Erro ao verificar atualizações:', error);
         return { success: false, error: error.message };
     }
 });
@@ -632,7 +639,7 @@ ipcMain.handle('check-for-updates', async () => {
 // Função para verificar releases via API REST do GitHub
 async function checkGitHubReleases() {
     try {
-        console.log('🔍 Verificando releases via API REST do GitHub...');
+        console.log('Verificando releases via API REST do GitHub...');
         
         // Primeiro, verificar se o repositório existe
         const repoResponse = await axios.get('https://api.github.com/repos/AlexandreSilvestrin/XY-task', {
@@ -643,7 +650,7 @@ async function checkGitHubReleases() {
             timeout: 10000
         });
         
-        console.log('📋 Repositório encontrado:', repoResponse.data.full_name);
+        console.log('Repositório encontrado:', repoResponse.data.full_name);
         
         // Agora buscar as releases
         const releasesResponse = await axios.get('https://api.github.com/repos/AlexandreSilvestrin/XY-task/releases', {
@@ -654,7 +661,7 @@ async function checkGitHubReleases() {
             timeout: 10000
         });
         
-        console.log('📋 Total de releases encontradas:', releasesResponse.data.length);
+        console.log('Total de releases encontradas:', releasesResponse.data.length);
         
         if (releasesResponse.data.length === 0) {
             throw new Error('Nenhuma release encontrada no repositório');
@@ -663,8 +670,8 @@ async function checkGitHubReleases() {
         const latestRelease = releasesResponse.data[0]; // Primeira release é a mais recente
         const currentVersion = app.getVersion();
         
-        console.log('📋 Release mais recente:', latestRelease.tag_name);
-        console.log('📋 Versão atual:', currentVersion);
+        console.log('Release mais recente:', latestRelease.tag_name);
+        console.log('Versão atual:', currentVersion);
         
         // Comparar versões
         const isUpdateAvailable = compareVersions(latestRelease.tag_name.replace('v', ''), currentVersion) > 0;
@@ -678,7 +685,7 @@ async function checkGitHubReleases() {
         };
         
     } catch (error) {
-        console.error('❌ Erro ao verificar releases do GitHub:', error);
+        console.error('Erro ao verificar releases do GitHub:', error);
         
         // Se for erro 404, pode ser que o repositório não exista ou seja privado
         if (error.response && error.response.status === 404) {
@@ -708,7 +715,7 @@ function compareVersions(version1, version2) {
 // Função para baixar atualização do GitHub
 async function downloadUpdateFromGitHub(releaseInfo) {
     try {
-        console.log('📥 Baixando atualização do GitHub...');
+        console.log('Baixando atualização do GitHub...');
         
         // Encontrar o arquivo de instalação para Windows
         const installerAsset = releaseInfo.assets.find(asset => 
@@ -720,8 +727,8 @@ async function downloadUpdateFromGitHub(releaseInfo) {
             throw new Error('Arquivo de instalação não encontrado na release');
         }
         
-        console.log('📦 Arquivo encontrado:', installerAsset.name);
-        console.log('📦 URL de download:', installerAsset.browser_download_url);
+        console.log('Arquivo encontrado:', installerAsset.name);
+        console.log('URL de download:', installerAsset.browser_download_url);
         
         // Baixar o arquivo
         const response = await axios({
@@ -737,7 +744,7 @@ async function downloadUpdateFromGitHub(releaseInfo) {
         const downloadsPath = app.getPath('downloads');
         const installerPath = path.join(downloadsPath, installerAsset.name);
         
-        console.log('💾 Salvando em:', installerPath);
+        console.log('Salvando em:', installerPath);
         
         // Salvar o arquivo
         const writer = fs.createWriteStream(installerPath);
@@ -745,7 +752,7 @@ async function downloadUpdateFromGitHub(releaseInfo) {
         
         return new Promise((resolve, reject) => {
             writer.on('finish', () => {
-                console.log('✅ Download concluído:', installerPath);
+                console.log('Download concluído:', installerPath);
                 resolve({
                     success: true,
                     installerPath: installerPath,
@@ -755,24 +762,24 @@ async function downloadUpdateFromGitHub(releaseInfo) {
             });
             
             writer.on('error', (error) => {
-                console.error('❌ Erro ao salvar arquivo:', error);
+                console.error('Erro ao salvar arquivo:', error);
                 reject(error);
             });
         });
         
     } catch (error) {
-        console.error('❌ Erro ao baixar atualização:', error);
+        console.error('Erro ao baixar atualização:', error);
         throw error;
     }
 }
 
 ipcMain.handle('download-update', async () => {
     try {
-        console.log('📥 Baixando atualização...');
+        console.log('Baixando atualização...');
         await autoUpdater.downloadUpdate();
         return { success: true };
     } catch (error) {
-        console.error('❌ Erro ao baixar atualização:', error);
+        console.error('Erro ao baixar atualização:', error);
         return { success: false, error: error.message };
     }
 });
@@ -780,7 +787,7 @@ ipcMain.handle('download-update', async () => {
 // Handler para instalar atualização baixada
 ipcMain.handle('install-update', async () => {
     try {
-        console.log('🚀 Instalando atualização...');
+        console.log('Instalando atualização...');
         
         // Encontrar o arquivo de instalação mais recente na pasta Downloads
         const downloadsPath = app.getPath('downloads');
@@ -797,7 +804,7 @@ ipcMain.handle('install-update', async () => {
         }
         
         const installerPath = path.join(downloadsPath, installerFile);
-        console.log('📦 Executando instalador:', installerPath);
+        console.log('Executando instalador:', installerPath);
         
         // Executar o instalador
         const { spawn } = require('child_process');
@@ -816,7 +823,7 @@ ipcMain.handle('install-update', async () => {
         return { success: true, installerPath: installerPath };
         
     } catch (error) {
-        console.error('❌ Erro ao instalar atualização:', error);
+        console.error('Erro ao instalar atualização:', error);
         return { success: false, error: error.message };
     }
 });
@@ -834,17 +841,17 @@ ipcMain.handle('get-update-info', () => {
 
 // Função para verificar e finalizar processos Python órfãos
 function cleanupOrphanedProcesses() {
-    console.log('🔍 Verificando processos Python órfãos...');
+    console.log('Verificando processos Python órfãos...');
     
     // No Windows, podemos usar tasklist para verificar processos Python
     if (process.platform === 'win32') {
         const { exec } = require('child_process');
         exec('tasklist /FI "IMAGENAME eq python.exe" /FO CSV', (error, stdout) => {
             if (!error && stdout.includes('python.exe')) {
-                console.log('⚠️ Processos Python encontrados no sistema:');
+                console.log('Processos Python encontrados no sistema:');
                 console.log(stdout);
             } else {
-                console.log('✅ Nenhum processo Python órfão encontrado');
+                console.log('Nenhum processo Python órfão encontrado');
             }
         });
     }
@@ -852,7 +859,7 @@ function cleanupOrphanedProcesses() {
 
 // Eventos da aplicação
 app.whenReady().then(async () => {
-    console.log('🚀 Aplicação Electron iniciada');
+    console.log('Aplicação Electron iniciada');
     
     // Verificar processos órfãos na inicialização
     cleanupOrphanedProcesses();
@@ -869,7 +876,7 @@ app.whenReady().then(async () => {
 });
 
 app.on('window-all-closed', async () => {
-    console.log('🪟 Todas as janelas foram fechadas');
+    console.log('Todas as janelas foram fechadas');
     
     // Parar servidor Python
     await stopPythonServer();
@@ -884,7 +891,7 @@ app.on('window-all-closed', async () => {
 });
 
 app.on('before-quit', async (event) => {
-    console.log('🛑 Aplicação sendo finalizada...');
+    console.log('Aplicação sendo finalizada...');
     
     // Prevenir o fechamento imediato para garantir limpeza
     event.preventDefault();
@@ -899,13 +906,13 @@ app.on('before-quit', async (event) => {
 });
 
 app.on('will-quit', async (event) => {
-    console.log('🛑 Finalizando aplicação...');
+    console.log('Finalizando aplicação...');
     await stopPythonServer();
 });
 
 // Tratamento de erros não capturados
 process.on('uncaughtException', (error) => {
-    console.error('❌ Erro não capturado:', error);
+    console.error('Erro não capturado:', error);
     
     dialog.showErrorBox(
         'Erro Crítico',
@@ -916,11 +923,11 @@ process.on('uncaughtException', (error) => {
 });
 
 process.on('unhandledRejection', (reason, promise) => {
-    console.error('❌ Promise rejeitada não tratada:', reason);
+    console.error('Promise rejeitada não tratada:', reason);
 });
 
 // Log de informações do sistema
-console.log('📊 Informações do Sistema:');
+console.log('Informações do Sistema:');
 console.log('  - Electron:', process.versions.electron);
 console.log('  - Node.js:', process.versions.node);
 console.log('  - Chrome:', process.versions.chrome);

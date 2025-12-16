@@ -164,12 +164,12 @@
         </div>
     </div>
 
-    <div class="version" id="version">v1.0.13</div>
+    <div class="version" id="version">v${version}</div>
 
     <script>
         // Capturar versão da URL
         const urlParams = new URLSearchParams(window.location.search);
-        const version = urlParams.get('version') || '1.0.13';
+        const version = urlParams.get('version');
         
         // Atualizar versão no DOM
         const versionElement = document.getElementById('version');

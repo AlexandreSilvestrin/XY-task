@@ -1,9 +1,19 @@
+# -*- coding: utf-8 -*-
+import sys
+import os
+
+# Configurar codificação UTF-8 para stdout e stderr
+# Nota: 'win32' no Python identifica TODAS as versões do Windows (32 e 64 bits)
+# É o identificador padrão usado pelo Python para qualquer versão do Windows
+if sys.platform == 'win32':
+    import codecs
+    sys.stdout = codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict')
+    sys.stderr = codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict')
+
 try:
     from flask import Flask, request, jsonify
     from flask_cors import CORS
-    import os
     import subprocess
-    import sys
     import json
     import glob
     import signal
@@ -13,12 +23,20 @@ try:
 
     # Adicionar o diretório atual ao sys.path para importar módulos locais
     sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
-
+    
+    # Garantir UTF-8 (se reconfigure não estiver disponível, já foi configurado acima)
+    try:
+        sys.stdout.reconfigure(encoding='utf-8')
+        sys.stderr.reconfigure(encoding='utf-8')
+    except (AttributeError, ValueError):
+        # reconfigure não disponível ou já configurado, usar configuração anterior
+        pass
+    
     from func.balancete import processar_balancete
 
 except ImportError as e:
     print("\n" + "="*60)
-    print("❌ ERRO: Biblioteca não encontrada!")
+    print(" ERRO: Biblioteca não encontrada!")
     print("="*60)
     print(f"Erro: {e}")
     print("\nPara resolver, instale as dependências com:")
