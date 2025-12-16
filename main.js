@@ -512,24 +512,109 @@ ipcMain.handle('force-stop-python', async () => {
     return { success: true };
 });
 
+// Função para comparar versões
+function compareVersions(version1, version2) {
+    const v1parts = version1.split('.').map(Number);
+    const v2parts = version2.split('.').map(Number);
+    
+    for (let i = 0; i < Math.max(v1parts.length, v2parts.length); i++) {
+        const v1part = v1parts[i] || 0;
+        const v2part = v2parts[i] || 0;
+        
+        if (v1part > v2part) return 1;
+        if (v1part < v2part) return -1;
+    }
+    
+    return 0;
+}
+
+// Função para verificar releases via API REST do GitHub
+async function checkGitHubReleases() {
+    try {
+        console.log('Verificando releases via API REST do GitHub...');
+        
+        // Buscar as releases
+        const releasesResponse = await axios.get('https://api.github.com/repos/AlexandreSilvestrin/XY-task/releases', {
+            headers: {
+                'User-Agent': 'XY-task-updater',
+                'Accept': 'application/vnd.github.v3+json'
+            },
+            timeout: 10000
+        });
+        
+        console.log('Total de releases encontradas:', releasesResponse.data.length);
+        
+        if (releasesResponse.data.length === 0) {
+            throw new Error('Nenhuma release encontrada no repositório');
+        }
+        
+        const latestRelease = releasesResponse.data[0]; // Primeira release é a mais recente
+        const currentVersion = app.getVersion();
+        
+        console.log('Release mais recente:', latestRelease.tag_name);
+        console.log('Versão atual:', currentVersion);
+        
+        // Extrair versão da tag (remover 'v' se houver)
+        const latestVersion = latestRelease.tag_name.replace(/^v/, '');
+        
+        // Comparar versões
+        const isUpdateAvailable = compareVersions(latestVersion, currentVersion) > 0;
+        
+        return {
+            updateAvailable: isUpdateAvailable,
+            currentVersion: currentVersion,
+            latestVersion: latestVersion,
+            releaseInfo: latestRelease,
+            totalReleases: releasesResponse.data.length
+        };
+        
+    } catch (error) {
+        console.error('Erro ao verificar releases do GitHub:', error);
+        
+        // Se for erro 404, pode ser que o repositório não exista ou seja privado
+        if (error.response && error.response.status === 404) {
+            throw new Error('Repositório não encontrado ou não acessível. Verifique se o repositório existe e é público.');
+        }
+        
+        throw error;
+    }
+}
+
 // Handlers para controle de atualizações
 // O update-electron-app cuida automaticamente das atualizações
-// Estes handlers são mantidos apenas para compatibilidade com o frontend
+// Este handler permite verificação manual via botão
 ipcMain.handle('check-for-updates', async () => {
     try {
-        console.log('Verificação de atualizações é feita automaticamente pelo update-electron-app');
-        // O update-electron-app verifica automaticamente, então apenas retornamos a versão atual
+        console.log('Verificação manual de atualizações solicitada...');
+        
+        // Verificar apenas se estiver empacotado (em desenvolvimento não faz sentido)
+        if (!app.isPackaged) {
+            console.log('Modo desenvolvimento - simulando verificação');
+            return { 
+                success: true, 
+                result: {
+                    updateAvailable: false,
+                    currentVersion: app.getVersion(),
+                    message: 'Modo desenvolvimento - verificação de atualizações disponível apenas em versão empacotada'
+                }
+            };
+        }
+        
+        // Fazer verificação manual via API do GitHub
+        const result = await checkGitHubReleases();
+        
+        console.log('Resultado da verificação:', result);
+        
         return { 
             success: true, 
-            result: {
-                updateAvailable: false,
-                currentVersion: app.getVersion(),
-                message: 'As atualizações são verificadas automaticamente. Você será notificado quando houver uma nova versão disponível.'
-            }
+            result: result
         };
     } catch (error) {
         console.error('Erro ao verificar atualizações:', error);
-        return { success: false, error: error.message };
+        return { 
+            success: false, 
+            error: error.message 
+        };
     }
 });
 

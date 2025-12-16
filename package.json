@@ -1,6 +1,6 @@
 {
   "name": "xy-task",
-  "version": "1.0.18",
+  "version": "1.0.19",
   "description": "Aplicação XY-task - Electron + Python para transformação de arquivos",
   "main": "main.js",
   "scripts": {
@@ -28,6 +28,10 @@
   ],
   "author": "Alexandre Silvestrin",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/AlexandreSilvestrin/XY-task.git"
+  },
   "devDependencies": {
     "electron": "^28.0.0",
     "electron-builder": "^24.13.3",
