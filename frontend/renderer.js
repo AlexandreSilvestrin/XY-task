@@ -1101,10 +1101,16 @@ async function checkForUpdates() {
             addUpdateLogEntry('📡 Chamando API do Electron para verificar atualizações...', 'info');
             const result = await window.electronAPI.checkForUpdates();
             console.log(' Resultado da verificação:', result);
-            addUpdateLogEntry(` Resultado da API: ${JSON.stringify(result)}`, 'info');
+            // addUpdateLogEntry(` Resultado da API: ${JSON.stringify(result)}`, 'info');
             
             // Processar resultado da verificação
             if (result.success && result.result.updateAvailable) {
+                // Atualizar estado da atualização
+                updateState.updateAvailable = true;
+                updateState.latestVersion = result.result.latestVersion;
+                updateState.currentVersion = result.result.currentVersion;
+                updateState.isChecking = false;
+                
                 addUpdateLogEntry(`🎉 Atualização disponível: v${result.result.latestVersion}`, 'success');
                 addUpdateLogEntry(` Download disponível em: ${result.result.releaseInfo.html_url}`, 'info');
                 
@@ -1117,9 +1123,28 @@ async function checkForUpdates() {
                     updateVersionNotification('downloading', result.result.latestVersion);
                 }
             } else if (result.success) {
+                // Atualizar estado - sem atualização disponível
+                updateState.updateAvailable = false;
+                updateState.currentVersion = result.result.currentVersion;
+                updateState.isChecking = false;
+                
                 addUpdateLogEntry(` Aplicação está atualizada (v${result.result.currentVersion})`, 'success');
                 updateVersionNotification('updated', result.result.currentVersion);
             }
+            
+            // Restaurar botões após verificação
+            if (updateElements.mainCheckUpdatesBtn) {
+                updateElements.mainCheckUpdatesBtn.disabled = false;
+                updateElements.mainCheckUpdatesBtn.innerHTML = ' Verificar Atualizações Agora';
+            }
+            
+            if (versionElements.checkBtn) {
+                versionElements.checkBtn.disabled = false;
+                versionElements.checkBtn.textContent = '🔄';
+                versionElements.checkBtn.title = 'Verificar atualizações';
+            }
+            
+            updateUI();
         } else {
             addUpdateLogEntry(' API do Electron não disponível', 'error');
         }
@@ -1162,25 +1187,36 @@ async function downloadUpdate() {
         updateUI();
         
         if (window.electronAPI && window.electronAPI.downloadUpdate) {
+            addUpdateLogEntry(' Iniciando download do instalador...', 'info');
+            updateVersionNotification('downloading');
+            
             const result = await window.electronAPI.downloadUpdate();
             console.log(' Resultado do download:', result);
             
             if (result.success) {
-                addUpdateLogEntry(' Download concluído com sucesso!', 'success');
+                addUpdateLogEntry(` Download concluído com sucesso!`, 'success');
+                addUpdateLogEntry(` Instalador salvo em: ${result.installerPath}`, 'info');
+                addUpdateLogEntry(` Versão: ${result.version}`, 'info');
+                
                 updateState.isDownloading = false;
                 updateState.updateReady = true;
+                updateState.updateDownloaded = true;
                 updateStatus('Atualização pronta para instalação!', 'success');
+                updateVersionNotification('ready', result.version);
                 hideProgressBar();
                 updateUI();
             } else {
                 addUpdateLogEntry(` Erro no download: ${result.error}`, 'error');
                 updateState.isDownloading = false;
                 updateStatus(`Erro: ${result.error}`, 'error');
+                updateVersionNotification('available', updateState.latestVersion);
                 hideProgressBar();
                 updateUI();
             }
         } else {
             addUpdateLogEntry(' API de download não disponível', 'error');
+            updateState.isDownloading = false;
+            updateUI();
         }
     } catch (error) {
         console.error(' Erro ao baixar atualização:', error);

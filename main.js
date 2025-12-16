@@ -618,6 +618,100 @@ ipcMain.handle('check-for-updates', async () => {
     }
 });
 
+// Função para baixar atualização do GitHub
+async function downloadUpdateFromGitHub(releaseInfo) {
+    try {
+        console.log('Baixando atualização do GitHub...');
+        
+        // Encontrar o arquivo de instalação para Windows
+        const installerAsset = releaseInfo.assets.find(asset => 
+            asset.name.includes('.exe') && 
+            (asset.name.includes('Setup') || asset.name.includes('Installer') || asset.name.includes('XY-task'))
+        );
+        
+        if (!installerAsset) {
+            throw new Error('Arquivo de instalação não encontrado na release');
+        }
+        
+        console.log('Arquivo encontrado:', installerAsset.name);
+        console.log('URL de download:', installerAsset.browser_download_url);
+        
+        // Baixar o arquivo
+        const response = await axios({
+            method: 'GET',
+            url: installerAsset.browser_download_url,
+            responseType: 'stream',
+            headers: {
+                'User-Agent': 'XY-task-updater',
+                'Accept': 'application/octet-stream'
+            }
+        });
+        
+        const downloadsPath = app.getPath('downloads');
+        const installerPath = path.join(downloadsPath, installerAsset.name);
+        
+        console.log('Salvando em:', installerPath);
+        
+        // Salvar o arquivo
+        const writer = fs.createWriteStream(installerPath);
+        response.data.pipe(writer);
+        
+        return new Promise((resolve, reject) => {
+            writer.on('finish', () => {
+                console.log('Download concluído:', installerPath);
+                resolve({
+                    success: true,
+                    installerPath: installerPath,
+                    version: releaseInfo.tag_name.replace(/^v/, ''),
+                    releaseInfo: releaseInfo
+                });
+            });
+            
+            writer.on('error', (error) => {
+                console.error('Erro ao salvar arquivo:', error);
+                reject(error);
+            });
+        });
+        
+    } catch (error) {
+        console.error('Erro ao baixar atualização:', error);
+        throw error;
+    }
+}
+
+// Handler para baixar atualização manualmente
+ipcMain.handle('download-update', async () => {
+    try {
+        console.log('Download manual de atualização solicitado...');
+        
+        // Primeiro verificar qual é a última release
+        const releaseInfo = await checkGitHubReleases();
+        
+        if (!releaseInfo.updateAvailable) {
+            return { 
+                success: false, 
+                error: 'Nenhuma atualização disponível' 
+            };
+        }
+        
+        // Baixar o instalador
+        const downloadResult = await downloadUpdateFromGitHub(releaseInfo.releaseInfo);
+        
+        return {
+            success: true,
+            installerPath: downloadResult.installerPath,
+            version: downloadResult.version
+        };
+        
+    } catch (error) {
+        console.error('Erro ao baixar atualização:', error);
+        return { 
+            success: false, 
+            error: error.message 
+        };
+    }
+});
+
 ipcMain.handle('get-update-info', () => {
     return {
         currentVersion: app.getVersion(),
