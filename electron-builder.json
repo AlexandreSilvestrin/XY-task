@@ -35,12 +35,6 @@
     "compression": "maximum",
     "artifactName": "${productName}-${version}-${arch}.${ext}"
   },
-  "mac": {
-    "target": "dmg",
-    "icon": "assets/icon_pg.png",
-    "category": "public.app-category.productivity",
-    "compression": "maximum"
-  },
   "linux": {
     "target": "AppImage",
     "icon": "assets/icon_pg.png",
