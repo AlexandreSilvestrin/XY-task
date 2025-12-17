@@ -5,16 +5,13 @@
     "output": "dist"
   },
   "files": [
-    "main.js",
-    "preload.js",
-    "package.json",
-    "frontend/**/*",
-    "assets/**/*",
-    "node_modules/axios/**/*",
-    "node_modules/axios/**/*.js",
-    "node_modules/axios/**/*.json",
-    "node_modules/electron-updater/**/*"
-  ],
+  "main.js",
+  "preload.js",
+  "package.json",
+  "frontend/**/*",
+  "assets/**/*",
+  "backend/**/*"
+],
   "extraResources": [
     {
       "from": "backend/",
