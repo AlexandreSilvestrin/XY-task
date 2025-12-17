@@ -712,6 +712,88 @@ ipcMain.handle('download-update', async () => {
     }
 });
 
+// Handler para instalar atualização baixada
+ipcMain.handle('install-update', async (event, installerPath = null) => {
+    try {
+        console.log('Instalação de atualização solicitada...');
+        
+        let installerFilePath = installerPath;
+        
+        // Se não foi passado um caminho, procurar na pasta Downloads
+        if (!installerFilePath) {
+            const downloadsPath = app.getPath('downloads');
+            
+            // Verificar se a pasta existe
+            if (!fs.existsSync(downloadsPath)) {
+                throw new Error('Pasta Downloads não encontrada');
+            }
+            
+            const files = fs.readdirSync(downloadsPath);
+            
+            // Procurar por arquivos de instalação do XY-task
+            const installerFiles = files.filter(file => 
+                (file.includes('XY-task') || file.includes('xy-task')) && 
+                (file.includes('Setup') || file.includes('Installer') || file.match(/XY-task.*\.exe$/i)) && 
+                file.endsWith('.exe')
+            );
+            
+            if (installerFiles.length === 0) {
+                throw new Error('Arquivo de instalação não encontrado na pasta Downloads. Certifique-se de que o download foi concluído.');
+            }
+            
+            // Pegar o arquivo mais recente por data de modificação
+            const installerFilesWithStats = installerFiles.map(file => {
+                const filePath = path.join(downloadsPath, file);
+                const stats = fs.statSync(filePath);
+                return {
+                    name: file,
+                    path: filePath,
+                    mtime: stats.mtime
+                };
+            });
+            
+            // Ordenar por data de modificação (mais recente primeiro)
+            installerFilesWithStats.sort((a, b) => b.mtime - a.mtime);
+            installerFilePath = installerFilesWithStats[0].path;
+        }
+        
+        // Verificar se o arquivo existe
+        if (!fs.existsSync(installerFilePath)) {
+            throw new Error(`Arquivo de instalação não encontrado: ${installerFilePath}`);
+        }
+        
+        console.log('Executando instalador:', installerFilePath);
+        
+        // Executar o instalador
+        // No Windows, sem parâmetros para mostrar o instalador normalmente
+        const installerProcess = spawn(installerFilePath, [], {
+            detached: true,
+            stdio: 'ignore',
+            shell: true // Usar shell no Windows para executar .exe
+        });
+        
+        installerProcess.unref();
+        
+        // Aguardar um pouco e então fechar a aplicação
+        setTimeout(() => {
+            console.log('Fechando aplicação para permitir instalação...');
+            app.quit();
+        }, 2000);
+        
+        return { 
+            success: true, 
+            installerPath: installerFilePath 
+        };
+        
+    } catch (error) {
+        console.error('Erro ao instalar atualização:', error);
+        return { 
+            success: false, 
+            error: error.message 
+        };
+    }
+});
+
 ipcMain.handle('get-update-info', () => {
     return {
         currentVersion: app.getVersion(),

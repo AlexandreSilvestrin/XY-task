@@ -32,7 +32,7 @@ contextBridge.exposeInMainWorld('electronAPI', {
     // Controle de atualizações
     checkForUpdates: () => ipcRenderer.invoke('check-for-updates'),
     downloadUpdate: () => ipcRenderer.invoke('download-update'),
-    installUpdate: () => ipcRenderer.invoke('install-update'),
+    installUpdate: (installerPath) => ipcRenderer.invoke('install-update', installerPath),
     getUpdateInfo: () => ipcRenderer.invoke('get-update-info'),
     
     // Eventos de atualização

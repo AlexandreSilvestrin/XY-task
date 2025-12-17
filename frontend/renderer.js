@@ -708,7 +708,8 @@ let updateState = {
     updateAvailable: false,
     updateDownloaded: false,
     currentVersion: null,
-    latestVersion: null
+    latestVersion: null,
+    installerPath: null // Caminho do instalador baixado
 };
 
 // Estado da notificação de versão
@@ -1198,6 +1199,8 @@ async function downloadUpdate() {
                 addUpdateLogEntry(` Instalador salvo em: ${result.installerPath}`, 'info');
                 addUpdateLogEntry(` Versão: ${result.version}`, 'info');
                 
+                // Armazenar o caminho do instalador
+                updateState.installerPath = result.installerPath;
                 updateState.isDownloading = false;
                 updateState.updateReady = true;
                 updateState.updateDownloaded = true;
@@ -1240,7 +1243,9 @@ async function installUpdate() {
         updateStatus('Instalando atualização e reiniciando...', 'info');
         
         if (window.electronAPI && window.electronAPI.installUpdate) {
-            const result = await window.electronAPI.installUpdate();
+            // Passar o caminho do instalador se disponível
+            const installerPath = updateState.installerPath || null;
+            const result = await window.electronAPI.installUpdate(installerPath);
             console.log(' Resultado da instalação:', result);
             
             if (result.success) {
